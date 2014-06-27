@@ -85,12 +85,12 @@ public class Model implements Cloneable {
     /**
      * the number of levels of the Laplacian pyramid that are filtered
      */
-    public int generalizationMaxLevels = 3;
+    public int generalizationMaxLevels = 0;
 
     /**
      * amount of filtering applied to generalizationMaxLevels pyramid levels.
      * Between -1 and +1. With -1 the weight for all generalizationMaxLevels is
-     * 1 (hence no generalization). With +1 the weigh for all 
+     * 1 (hence no generalization). With +1 the weigh for all
      * generalizationMaxLevels is 0.
      */
     private double generalizationDetails = -0.3;
@@ -167,6 +167,12 @@ public class Model implements Cloneable {
      */
     public int contoursIllluminatedGray = 255;
 
+    /**
+     * localGridModel encapsulates the settings and cashed intermediate results
+     * for computing a locally filtered grid for local hypsometric tinting.
+     */
+    private final LocalGridModel localGridModel = new LocalGridModel();
+
     public Model() {
         predefinedColorRamps = new ArrayList<>();
 
@@ -210,13 +216,14 @@ public class Model implements Cloneable {
             new Color(255, 255, 255)
         };
         predefinedColorRamps.add(new ColorRamp("Hypsometric", col, pos));
-        
+
         colorRamp = predefinedColorRamps.get(0);
     }
 
     /**
      * Use one of the named color ramps. If an invalid name is passed, the color
      * ramp does not change.
+     *
      * @param name The name of the ColorRamp to use.
      */
     public void selectColorRamp(String name) {
@@ -230,7 +237,8 @@ public class Model implements Cloneable {
 
     /**
      * Computes the weight for one level of the Laplacian pyramid.
-     * @param pyramidLevel the pyramid level. The level with the highest 
+     *
+     * @param pyramidLevel the pyramid level. The level with the highest
      * frequencies has a value of 0.
      * @return the weight for that pyramid level between 0 and 1
      */
@@ -238,15 +246,14 @@ public class Model implements Cloneable {
         if (pyramidLevel >= generalizationMaxLevels || generalizationMaxLevels <= 0) {
             return 1;
         }
-        
+
         // return (float) (1 / Math.pow(base, maxLevels - pyramidLevel));
         // simplified:
         // return (float) (Math.pow(base, pyramidLevel - maxLevels));
-        
         if (generalizationDetails == 1d) {
             return 0;
         }
-        
+
         double m, c;
         if (generalizationDetails > 0) {
             // a line of the form y = mx + c
@@ -261,11 +268,11 @@ public class Model implements Cloneable {
             m = (1 + generalizationDetails) / generalizationMaxLevels;
         }
         double w = m * pyramidLevel + c;
-        
+
         // clamp weight to [0..1]
         return (float) Math.min(Math.max(0d, w), 1d);
     }
-    
+
     /**
      * re-computes generalizedGrid. Call this method whenever the generalization
      * parameters have changed.
@@ -274,20 +281,19 @@ public class Model implements Cloneable {
         if (laplacianPyramid == null) {
             return;
         }
-        
+
         // compute weights for summing levels in Laplacian pyramid
         float[] w = new float[laplacianPyramid.getLevels().length];
         for (int i = 0; i < w.length; i++) {
             w[i] = getPyramidLevelWeight(i);
         }
-        laplacianPyramid.setWeights(w);
-        
+
         // sum the Laplacian pyramids
-        generalizedGrid = laplacianPyramid.sumLevels();
+        generalizedGrid = laplacianPyramid.sumLevels(w);
 
         // scale the minimum and maximum values of the output generalizedGrid to 
         // the same range as the input generalizedGrid.
-        new GridScaleToRangeOperator(gridMinMax).operate(generalizedGrid);
+        new GridScaleToRangeOperator(gridMinMax).operate(generalizedGrid, generalizedGrid);
 
         generalizedSlopeGrid = new GridSlopeOperator().operate(generalizedGrid);
     }
@@ -296,15 +302,15 @@ public class Model implements Cloneable {
      * Creates a new BufferedImage if the passed image is null or smaller than
      * the current grid.
      *
-     * @param scale Scale factor by which the created image will be larger
-     * than the grid.
+     * @param scale Scale factor by which the created image will be larger than
+     * the grid.
      * @return A new image or null
      */
     public BufferedImage createDestinationImage(int scale) {
         if (generalizedGrid == null) {
             return null;
         }
-        
+
         //Get the number of columns and rows in the DEM
         int cols = generalizedGrid.getCols() * scale;
         int rows = generalizedGrid.getRows() * scale;
@@ -314,8 +320,10 @@ public class Model implements Cloneable {
 
     /**
      * Render background image, such as shading or hypsometric tinting.
-     * @param destinationImage The background image will be rendered to this image.
-     * @return 
+     *
+     * @param destinationImage The background image will be rendered to this
+     * image.
+     * @return
      */
     public BufferedImage renderBackgroundImage(BufferedImage destinationImage) {
         if (generalizedGrid == null || destinationImage == null) {
@@ -340,22 +348,31 @@ public class Model implements Cloneable {
             // coloring
             ColorizerOperator colorizer = new ColorizerOperator(backgroundVisualization);
             colorizer.setColors(colorRamp.colors, colorRamp.colorPositions);
-            colorizer.operate(reliefComposite,
-                    generalizedGrid, destinationImage, gridMinMax[0], gridMinMax[1]);
+            
+            Grid terrainGrid;
+            if (backgroundVisualization.isLocal()) {
+                terrainGrid = localGridModel.getFilteredGrid();
+            } else {
+                terrainGrid = generalizedGrid;
+            }
+            colorizer.operate(reliefComposite, terrainGrid, destinationImage,
+                    gridMinMax[0], gridMinMax[1]);
         }
         return destinationImage;
     }
-    
+
     /**
      * Render foreground visualization: illuminated contours
-     * @param destinationImage The foreground image will be rendered to this image.
-     * @return 
+     *
+     * @param destinationImage The foreground image will be rendered to this
+     * image.
+     * @return
      */
     public BufferedImage renderForegroundImage(BufferedImage destinationImage) {
         if (foregroundVisualization != ForegroundVisualization.NONE) {
             boolean illuminated = (foregroundVisualization == ILLUMINATED_CONTOURS);
             IlluminatedContoursOperator op = setupIlluminatedContoursOperator(illuminated);
-            op.renderToImage(destinationImage, generalizedGrid, 
+            op.renderToImage(destinationImage, generalizedGrid,
                     generalizedSlopeGrid, null);
         }
         return destinationImage;
@@ -378,6 +395,10 @@ public class Model implements Cloneable {
         // create the Laplacian pyramid 
         laplacianPyramid = new LaplacianPyramid();
         laplacianPyramid.createPyramid(gaussianPyramid.getPyramid());
+
+        updateGeneralizedGrid();
+
+        localGridModel.setGrid(generalizedGrid, gridMinMax, laplacianPyramid);
     }
 
     /**
@@ -399,6 +420,15 @@ public class Model implements Cloneable {
     }
 
     /**
+     * Returns the locally filtered grid.
+     *
+     * @return the locally filtered grid.
+     */
+    public Grid getLocalGrid() {
+        return localGridModel.getFilteredGrid();
+    }
+
+    /**
      * Returns a grid with slope values for the generalized grid.
      *
      * @return The generalized grid.
@@ -408,11 +438,12 @@ public class Model implements Cloneable {
     }
 
     /**
-     * Initializes an illuminatedIlluminatedContoursOperator with the current 
+     * Initializes an illuminatedIlluminatedContoursOperator with the current
      * model settings.
+     *
      * @param illuminated If true illuminated contours are created, otherwise
      * shaded contours are created.
-     * @return 
+     * @return
      */
     public IlluminatedContoursOperator setupIlluminatedContoursOperator(
             boolean illuminated) {
@@ -427,7 +458,7 @@ public class Model implements Cloneable {
                 contoursGradientAngle,
                 contoursIllluminatedGray);
     }
-    
+
     /**
      * @return the generalizationDetails
      */
@@ -443,5 +474,21 @@ public class Model implements Cloneable {
             throw new IllegalArgumentException();
         }
         this.generalizationDetails = generalizationDetails;
+    }
+
+    public double getLocalGridLowPassStandardDeviation() {
+        return localGridModel.getLocalGridLowPassStd();
+    }
+
+    public int getLocalGridStandardDeviationLevels() {
+        return localGridModel.getLocalGridStandardDeviationLevels();
+    }
+
+    public void setLocalGridLowPassStd(double localGridLowPassStd) {
+        localGridModel.setLocalGridLowPassStd(localGridLowPassStd);
+    }
+
+    public void setLocalGridStandardDeviationLevels(int levels) {
+        localGridModel.setLocalGridStandardDeviationLevels(levels);
     }
 }

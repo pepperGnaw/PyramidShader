@@ -4,7 +4,9 @@ import com.bric.swing.MultiThumbSlider;
 import edu.oregonstate.cartography.app.ImageUtils;
 import edu.oregonstate.cartography.grid.Model;
 import edu.oregonstate.cartography.grid.Model.ColorRamp;
+import edu.oregonstate.cartography.grid.Model.ForegroundVisualization;
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator;
+import edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization;
 import static edu.oregonstate.cartography.gui.SettingsPanel.RenderSpeed.FAST;
 import static edu.oregonstate.cartography.gui.SettingsPanel.RenderSpeed.REGULAR;
 import java.awt.CardLayout;
@@ -16,6 +18,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JRootPane;
@@ -94,6 +97,36 @@ public class SettingsPanel extends javax.swing.JPanel {
         initComponents();
     }
 
+    /**
+     * Adjusts the visibility of the GUI components for configuring the
+     * different visualization types.
+     */
+    private void updateVisualizationPanelsVisibility() {
+
+        boolean isShading = false;
+        boolean isColored = false;
+        boolean isLocal = false;
+        boolean isSolidColor = false;
+
+        if (model != null && model.backgroundVisualization != null) {
+            isShading = model.backgroundVisualization.isShading();
+            isColored = model.backgroundVisualization.isColored();
+            isLocal = model.backgroundVisualization.isLocal();
+            isSolidColor = model.backgroundVisualization == ColorVisualization.CONTINUOUS;
+        }
+
+        verticalExaggerationPanel.setVisible(isShading);
+        colorGradientPanel.setVisible(isColored);
+        localHypsoPanel.setVisible(isLocal);
+        solidColorPanel.setVisible(isSolidColor);
+
+        // adjust size of dialog to make sure all components are visible
+        JRootPane rootPane = getRootPane();
+        if (rootPane != null) {
+            ((JDialog) (rootPane.getParent())).pack();
+        }
+    }
+
     public void updateImage(RenderSpeed renderSpeed) {
         MainWindow mainWindow = getOwnerWindow();
         if (mainWindow == null || model == null) {
@@ -143,25 +176,25 @@ public class SettingsPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         colorPopupMenu = new javax.swing.JPopupMenu();
-        colorButtonGroup = new javax.swing.ButtonGroup();
         tabbedPane = new javax.swing.JTabbedPane();
         javax.swing.JPanel visualizationContainer = new TransparentMacPanel();
         visualizationPanel = new TransparentMacPanel();
-        grayRadioButton = new javax.swing.JRadioButton();
-        hypsometricShadingRadioButton = new javax.swing.JRadioButton();
-        expositionRadioButton = new javax.swing.JRadioButton();
-        solidColorRadioButton = new javax.swing.JRadioButton();
+        visualizationComboBox = new javax.swing.JComboBox();
+        verticalExaggerationPanel = new TransparentMacPanel();
         verticalExaggerationLabel = new javax.swing.JLabel();
         verticalExaggerationSlider = new javax.swing.JSlider();
-        colorsCardsPanel = new TransparentMacPanel();
-        emptyPanel = new TransparentMacPanel();
-        colorGradientCardPanel = new TransparentMacPanel();
+        colorGradientPanel = new TransparentMacPanel();
         javax.swing.JLabel colorInfoLabel = new javax.swing.JLabel();
         colorGradientSlider = new com.bric.swing.GradientSlider();
         colorPresetsButton = new edu.oregonstate.cartography.gui.MenuToggleButton();
-        solidColorCardPanel = new TransparentMacPanel();
+        localHypsoPanel = new TransparentMacPanel();
+        javax.swing.JLabel jLabel1 = new javax.swing.JLabel();
+        javax.swing.JLabel jLabel2 = new javax.swing.JLabel();
+        localGridStandardDeviationFilterSizeSlider = new javax.swing.JSlider();
+        localGridLowPassSlider = new javax.swing.JSlider();
+        javax.swing.JLabel jLabel3 = new javax.swing.JLabel();
+        solidColorPanel = new TransparentMacPanel();
         solidColorButton = new edu.oregonstate.cartography.gui.ColorButton();
-        hypsometricRadioButton = new javax.swing.JRadioButton();
         javax.swing.JPanel generalizationContainer = new TransparentMacPanel();
         generalizationPanel = new TransparentMacPanel();
         javax.swing.JLabel generalizationDetailLabel = new javax.swing.JLabel();
@@ -197,68 +230,29 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 2, 2));
 
-        visualizationContainer.setLayout(new java.awt.GridBagLayout());
-
         visualizationPanel.setLayout(new java.awt.GridBagLayout());
 
-        colorButtonGroup.add(grayRadioButton);
-        grayRadioButton.setSelected(true);
-        grayRadioButton.setText("Gray Shading");
-        grayRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                grayRadioButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        visualizationPanel.add(grayRadioButton, gridBagConstraints);
-
-        colorButtonGroup.add(hypsometricShadingRadioButton);
-        hypsometricShadingRadioButton.setText("Hypsometric Color with Shading");
-        hypsometricShadingRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hypsometricShadingRadioButtonActionPerformed(evt);
+        visualizationComboBox.setModel(new DefaultComboBoxModel(ColorizerOperator.ColorVisualization.values()));
+        visualizationComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                visualizationComboBoxItemStateChanged(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        visualizationPanel.add(hypsometricShadingRadioButton, gridBagConstraints);
+        visualizationPanel.add(visualizationComboBox, gridBagConstraints);
 
-        colorButtonGroup.add(expositionRadioButton);
-        expositionRadioButton.setText("Exposition Color");
-        expositionRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                expositionRadioButtonActionPerformed(evt);
-            }
-        });
+        verticalExaggerationPanel.setLayout(new java.awt.GridBagLayout());
+
+        verticalExaggerationLabel.setText("Vertical Exaggeration for Shading");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        visualizationPanel.add(expositionRadioButton, gridBagConstraints);
-
-        colorButtonGroup.add(solidColorRadioButton);
-        solidColorRadioButton.setText("Continuous Tone (For Illuminated Contours)");
-        solidColorRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                solidColorRadioButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        visualizationPanel.add(solidColorRadioButton, gridBagConstraints);
-
-        verticalExaggerationLabel.setText("Vertical Exaggeration");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-        visualizationPanel.add(verticalExaggerationLabel, gridBagConstraints);
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        verticalExaggerationPanel.add(verticalExaggerationLabel, gridBagConstraints);
 
         verticalExaggerationSlider.setMajorTickSpacing(5);
         verticalExaggerationSlider.setMaximum(50);
@@ -268,6 +262,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         verticalExaggerationSlider.setSnapToTicks(true);
         verticalExaggerationSlider.setToolTipText("Vertical exaggeration to the grid applied for shading calculation.");
         verticalExaggerationSlider.setValue(10);
+        verticalExaggerationSlider.setPreferredSize(new java.awt.Dimension(300, 52));
         {
             java.util.Hashtable labels = verticalExaggerationSlider.createStandardLabels(10);
             java.util.Enumeration e = labels.elements();
@@ -277,7 +272,7 @@ public class SettingsPanel extends javax.swing.JPanel {
                 if (comp instanceof javax.swing.JLabel) {
                     javax.swing.JLabel label = (javax.swing.JLabel)(comp);
                     String v = df.format(Integer.parseInt(label.getText()) / 10f);
-                    label.setText(v + "\u00d7");
+                    label.setText("\u00d7" + v);
                 }
             }
             verticalExaggerationSlider.setLabelTable(labels);
@@ -289,24 +284,29 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        visualizationPanel.add(verticalExaggerationSlider, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        verticalExaggerationPanel.add(verticalExaggerationSlider, gridBagConstraints);
 
-        colorsCardsPanel.setLayout(new java.awt.CardLayout());
-        colorsCardsPanel.add(emptyPanel, "emptyCard");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+        visualizationPanel.add(verticalExaggerationPanel, gridBagConstraints);
 
-        colorGradientCardPanel.setLayout(new java.awt.GridBagLayout());
+        colorGradientPanel.setLayout(new java.awt.GridBagLayout());
 
         colorInfoLabel.setFont(colorInfoLabel.getFont().deriveFont(colorInfoLabel.getFont().getSize()-2f));
         colorInfoLabel.setText("Click on slider to add color; double-click on triangles to change.");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 0);
-        colorGradientCardPanel.add(colorInfoLabel, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        colorGradientPanel.add(colorInfoLabel, gridBagConstraints);
 
         colorGradientSlider.setPreferredSize(new java.awt.Dimension(360, 30));
         colorGradientSlider.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
@@ -317,7 +317,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
-        colorGradientCardPanel.add(colorGradientSlider, gridBagConstraints);
+        colorGradientPanel.add(colorGradientSlider, gridBagConstraints);
 
         colorPresetsButton.setText("Color Presets");
         colorPresetsButton.setPopupMenu(colorPopupMenu);
@@ -325,11 +325,80 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        colorGradientCardPanel.add(colorPresetsButton, gridBagConstraints);
+        colorGradientPanel.add(colorPresetsButton, gridBagConstraints);
 
-        colorsCardsPanel.add(colorGradientCardPanel, "colorGradientCard");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+        visualizationPanel.add(colorGradientPanel, gridBagConstraints);
 
-        solidColorCardPanel.setLayout(new java.awt.GridBagLayout());
+        localHypsoPanel.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setText("Low Pass Filter Size");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        localHypsoPanel.add(jLabel1, gridBagConstraints);
+
+        jLabel2.setText("Std Dev Filter Size");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        localHypsoPanel.add(jLabel2, gridBagConstraints);
+
+        localGridStandardDeviationFilterSizeSlider.setMajorTickSpacing(1);
+        localGridStandardDeviationFilterSizeSlider.setMaximum(10);
+        localGridStandardDeviationFilterSizeSlider.setPaintLabels(true);
+        localGridStandardDeviationFilterSizeSlider.setPaintTicks(true);
+        localGridStandardDeviationFilterSizeSlider.setSnapToTicks(true);
+        localGridStandardDeviationFilterSizeSlider.setPreferredSize(new java.awt.Dimension(240, 38));
+        localGridStandardDeviationFilterSizeSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                localGridStandardDeviationFilterSizeSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        localHypsoPanel.add(localGridStandardDeviationFilterSizeSlider, gridBagConstraints);
+
+        localGridLowPassSlider.setMaximum(99);
+        localGridLowPassSlider.setMinimum(3);
+        localGridLowPassSlider.setMinorTickSpacing(2);
+        localGridLowPassSlider.setPaintLabels(true);
+        localGridLowPassSlider.setPaintTicks(true);
+        localGridLowPassSlider.setSnapToTicks(true);
+        localGridLowPassSlider.setPreferredSize(new java.awt.Dimension(240, 38));
+        localGridLowPassSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                localGridLowPassSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        localHypsoPanel.add(localGridLowPassSlider, gridBagConstraints);
+
+        jLabel3.setText("Local Terrain Filtering");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        localHypsoPanel.add(jLabel3, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
+        visualizationPanel.add(localHypsoPanel, gridBagConstraints);
+
+        solidColorPanel.setLayout(new java.awt.GridBagLayout());
 
         solidColorButton.setText("Background Color");
         solidColorButton.addActionListener(new java.awt.event.ActionListener() {
@@ -339,30 +408,15 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        solidColorCardPanel.add(solidColorButton, gridBagConstraints);
-
-        colorsCardsPanel.add(solidColorCardPanel, "solidColorCard");
+        solidColorPanel.add(solidColorButton, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.insets = new java.awt.Insets(20, 0, 0, 0);
-        visualizationPanel.add(colorsCardsPanel, gridBagConstraints);
+        visualizationPanel.add(solidColorPanel, gridBagConstraints);
 
-        colorButtonGroup.add(hypsometricRadioButton);
-        hypsometricRadioButton.setText("Hypsometric Color");
-        hypsometricRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hypsometricRadioButtonActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        visualizationPanel.add(hypsometricRadioButton, gridBagConstraints);
-
-        visualizationContainer.add(visualizationPanel, new java.awt.GridBagConstraints());
+        visualizationContainer.add(visualizationPanel);
 
         tabbedPane.addTab("Visualization", visualizationContainer);
 
@@ -771,6 +825,8 @@ public class SettingsPanel extends javax.swing.JPanel {
         solidColorButton.setColor(m.solidColor);
         updateGeneralizationInfoLabelVisiblity();
 
+        localGridLowPassSlider.setValue((int) m.getLocalGridLowPassStandardDeviation());
+        localGridStandardDeviationFilterSizeSlider.setValue(m.getLocalGridStandardDeviationLevels());
         for (ColorRamp cr : model.predefinedColorRamps) {
             JMenuItem colorMenuItem = new JMenuItem(cr.name);
             colorMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -784,6 +840,8 @@ public class SettingsPanel extends javax.swing.JPanel {
             });
             colorPopupMenu.add(colorMenuItem);
         }
+
+        updateVisualizationPanelsVisibility();
         updateImage(REGULAR);
     }
 
@@ -855,30 +913,6 @@ public class SettingsPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_colorGradientSliderPropertyChange
 
-    private void expositionRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_expositionRadioButtonActionPerformed
-        model.backgroundVisualization = ColorizerOperator.ColorVisualization.EXPOSITION;
-        updateImage(REGULAR);
-        ((CardLayout) (colorsCardsPanel.getLayout())).show(colorsCardsPanel, "colorGradientCard");
-        verticalExaggerationLabel.setEnabled(true);
-        verticalExaggerationSlider.setEnabled(true);
-    }//GEN-LAST:event_expositionRadioButtonActionPerformed
-
-    private void grayRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_grayRadioButtonActionPerformed
-        model.backgroundVisualization = ColorizerOperator.ColorVisualization.GRAY_SHADING;
-        updateImage(REGULAR);
-        ((CardLayout) (colorsCardsPanel.getLayout())).show(colorsCardsPanel, "emptyCard");
-        verticalExaggerationLabel.setEnabled(true);
-        verticalExaggerationSlider.setEnabled(true);
-    }//GEN-LAST:event_grayRadioButtonActionPerformed
-
-    private void hypsometricShadingRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypsometricShadingRadioButtonActionPerformed
-        model.backgroundVisualization = ColorizerOperator.ColorVisualization.HYPSOMETRIC_SHADING;
-        updateImage(REGULAR);
-        ((CardLayout) (colorsCardsPanel.getLayout())).show(colorsCardsPanel, "colorGradientCard");
-        verticalExaggerationLabel.setEnabled(true);
-        verticalExaggerationSlider.setEnabled(true);
-    }//GEN-LAST:event_hypsometricShadingRadioButtonActionPerformed
-
     private void contoursIntervalTextBoxPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_contoursIntervalTextBoxPropertyChange
         Object contourTextVal = contoursIntervalTextBox.getValue();
         if (contourTextVal != null) {
@@ -898,7 +932,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         // temporarily remove event listener to avoid triggering a render event
         ChangeListener listener = contoursMinLineWidthSlider.getChangeListeners()[0];
         contoursMinLineWidthSlider.removeChangeListener(listener);
-        int width = Math.min(movingSlider.getValue(), (int)Math.round(model.contoursMinWidth * 10));
+        int width = Math.min(movingSlider.getValue(), (int) Math.round(model.contoursMinWidth * 10));
         contoursMinLineWidthSlider.setValue(width);
         // add the event lister back to the slider
         contoursMinLineWidthSlider.addChangeListener(listener);
@@ -959,14 +993,6 @@ public class SettingsPanel extends javax.swing.JPanel {
         updateImage(contoursGradientSlider.getValueIsAdjusting() ? FAST : REGULAR);
     }//GEN-LAST:event_contoursGradientSliderStateChanged
 
-    private void solidColorRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solidColorRadioButtonActionPerformed
-        model.backgroundVisualization = ColorizerOperator.ColorVisualization.CONTINUOUS;
-        updateImage(REGULAR);
-        ((CardLayout) (colorsCardsPanel.getLayout())).show(colorsCardsPanel, "solidColorCard");
-        verticalExaggerationLabel.setEnabled(false);
-        verticalExaggerationSlider.setEnabled(false);
-    }//GEN-LAST:event_solidColorRadioButtonActionPerformed
-
     private void solidColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_solidColorButtonActionPerformed
         model.solidColor = solidColorButton.getColor();
         updateImage(REGULAR);
@@ -976,15 +1002,15 @@ public class SettingsPanel extends javax.swing.JPanel {
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             switch (contoursComboBox.getSelectedIndex()) {
                 case 0:
-                    model.foregroundVisualization = Model.ForegroundVisualization.NONE;
+                    model.foregroundVisualization = ForegroundVisualization.NONE;
                     ((CardLayout) (contoursCardPanel.getLayout())).show(contoursCardPanel, "emptyCard");
                     break;
                 case 1:
-                    model.foregroundVisualization = Model.ForegroundVisualization.ILLUMINATED_CONTOURS;
+                    model.foregroundVisualization = ForegroundVisualization.ILLUMINATED_CONTOURS;
                     ((CardLayout) (contoursCardPanel.getLayout())).show(contoursCardPanel, "contoursSettingsCard");
                     break;
                 case 2:
-                    model.foregroundVisualization = Model.ForegroundVisualization.SHADED_CONTOURS;
+                    model.foregroundVisualization = ForegroundVisualization.SHADED_CONTOURS;
                     ((CardLayout) (contoursCardPanel.getLayout())).show(contoursCardPanel, "contoursSettingsCard");
                     break;
             }
@@ -993,22 +1019,37 @@ public class SettingsPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_contoursComboBoxItemStateChanged
 
-    private void hypsometricRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hypsometricRadioButtonActionPerformed
-        model.backgroundVisualization = ColorizerOperator.ColorVisualization.HYPSOMETRIC;
-        updateImage(REGULAR);
-        ((CardLayout) (colorsCardsPanel.getLayout())).show(colorsCardsPanel, "colorGradientCard");
-        verticalExaggerationLabel.setEnabled(false);
-        verticalExaggerationSlider.setEnabled(false);
-    }//GEN-LAST:event_hypsometricRadioButtonActionPerformed
+    private void visualizationComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_visualizationComboBoxItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            model.backgroundVisualization
+                    = (ColorVisualization) visualizationComboBox.getSelectedItem();
+            updateVisualizationPanelsVisibility();
+            updateImage(REGULAR);
+        }
+    }//GEN-LAST:event_visualizationComboBoxItemStateChanged
+
+    private void localGridStandardDeviationFilterSizeSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_localGridStandardDeviationFilterSizeSliderStateChanged
+        if (localGridStandardDeviationFilterSizeSlider.getValueIsAdjusting() == false) {
+            int levels = localGridStandardDeviationFilterSizeSlider.getValue();
+            model.setLocalGridStandardDeviationLevels(levels);
+            updateImage(REGULAR);
+        }
+    }//GEN-LAST:event_localGridStandardDeviationFilterSizeSliderStateChanged
+
+    private void localGridLowPassSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_localGridLowPassSliderStateChanged
+        if (localGridLowPassSlider.getValueIsAdjusting() == false) {
+            int filterSize = localGridLowPassSlider.getValue();
+            model.setLocalGridLowPassStd(filterSize);
+            updateImage(REGULAR);
+        }
+    }//GEN-LAST:event_localGridLowPassSliderStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSlider azimuthSlider;
-    private javax.swing.ButtonGroup colorButtonGroup;
-    private javax.swing.JPanel colorGradientCardPanel;
+    private javax.swing.JPanel colorGradientPanel;
     private com.bric.swing.GradientSlider colorGradientSlider;
     private javax.swing.JPopupMenu colorPopupMenu;
     private edu.oregonstate.cartography.gui.MenuToggleButton colorPresetsButton;
-    private javax.swing.JPanel colorsCardsPanel;
     private javax.swing.JPanel contoursCardPanel;
     private javax.swing.JComboBox contoursComboBox;
     private javax.swing.JPanel contoursEmptyPanel;
@@ -1020,24 +1061,23 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JPanel contoursPanel;
     private javax.swing.JPanel contoursSettingsPanel;
     private javax.swing.JSlider contoursShadowLineWidthSlider;
-    private javax.swing.JPanel emptyPanel;
-    private javax.swing.JRadioButton expositionRadioButton;
     private javax.swing.JLabel generalizationDetaiIndicator;
     private javax.swing.JSlider generalizationDetailSlider;
     private javax.swing.JLabel generalizationInfoLabel;
     private javax.swing.JSpinner generalizationMaxLevelsSpinner;
     private javax.swing.JPanel generalizationPanel;
-    private javax.swing.JRadioButton grayRadioButton;
-    private javax.swing.JRadioButton hypsometricRadioButton;
-    private javax.swing.JRadioButton hypsometricShadingRadioButton;
     private javax.swing.JPanel illuminatedContoursPanel;
     private javax.swing.JPanel illuminationPanel;
+    private javax.swing.JSlider localGridLowPassSlider;
+    private javax.swing.JSlider localGridStandardDeviationFilterSizeSlider;
+    private javax.swing.JPanel localHypsoPanel;
     private edu.oregonstate.cartography.gui.ColorButton solidColorButton;
-    private javax.swing.JPanel solidColorCardPanel;
-    private javax.swing.JRadioButton solidColorRadioButton;
+    private javax.swing.JPanel solidColorPanel;
     private javax.swing.JTabbedPane tabbedPane;
     private javax.swing.JLabel verticalExaggerationLabel;
+    private javax.swing.JPanel verticalExaggerationPanel;
     private javax.swing.JSlider verticalExaggerationSlider;
+    private javax.swing.JComboBox visualizationComboBox;
     private javax.swing.JPanel visualizationPanel;
     private javax.swing.JSlider zenithSlider;
     // End of variables declaration//GEN-END:variables

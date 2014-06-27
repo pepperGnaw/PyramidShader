@@ -1,10 +1,6 @@
 package edu.oregonstate.cartography.grid.operators;
 
 import edu.oregonstate.cartography.grid.Grid;
-import static edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization.EXPOSITION;
-import static edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization.GRAY_SHADING;
-import static edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization.HYPSOMETRIC;
-import static edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization.HYPSOMETRIC_SHADING;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -20,14 +16,51 @@ public class ColorizerOperator extends ThreadedGridOperator {
     /**
      * transparent white for void (NaN) values.
      */
-    private final int VOID_COLOR = 0x00FFFFFF;
+    private static final int VOID_COLOR = 0x00000000;
 
     /**
      * The type of colored visualization this operator can create.
      */
     public enum ColorVisualization {
 
-        GRAY_SHADING, EXPOSITION, HYPSOMETRIC_SHADING, HYPSOMETRIC, CONTINUOUS
+        GRAY_SHADING("Gray Shading"),
+        EXPOSITION("Exposition Color"),
+        HYPSOMETRIC_SHADING("Hypsometric Color with Shading"),
+        HYPSOMETRIC("Hypsometric Color"),
+        LOCAL_HYPSOMETRIC_SHADING("Local Hypsometric Color with Shading"),
+        LOCAL_HYPSOMETRIC("Local Hypsometric Color"),
+        CONTINUOUS("Continuous Tone (for Illuminated Contours)");
+
+        private final String description;
+
+        private ColorVisualization(String s) {
+            description = s;
+        }
+
+        public boolean isLocal() {
+            return this == LOCAL_HYPSOMETRIC 
+                    || this == LOCAL_HYPSOMETRIC_SHADING;
+        }
+
+        public boolean isShading() {
+            return this == GRAY_SHADING
+                    || this == EXPOSITION
+                    || this == HYPSOMETRIC_SHADING
+                    || this == LOCAL_HYPSOMETRIC_SHADING;
+        }
+        
+        public boolean isColored() {
+            return this == EXPOSITION
+                    || this == HYPSOMETRIC
+                    || this == HYPSOMETRIC_SHADING
+                    || this == LOCAL_HYPSOMETRIC
+                    || this == LOCAL_HYPSOMETRIC_SHADING;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
     }
 
     // minimum and maximum value in the elevation model
@@ -150,7 +183,7 @@ public class ColorizerOperator extends ThreadedGridOperator {
     }
 
     /**
-     * Do not call this method. It will throw an IllegalStateException.
+     * Do not call this method. It will throw an UnsupportedOperationException.
      *
      * @param src
      * @param dst
@@ -158,7 +191,7 @@ public class ColorizerOperator extends ThreadedGridOperator {
      */
     @Override
     public Grid operate(Grid src, Grid dst) {
-        throw new IllegalStateException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -214,19 +247,20 @@ public class ColorizerOperator extends ThreadedGridOperator {
                         argb = getLinearRGB(gray, 0, 255, 1f);
                         break;
                     case HYPSOMETRIC_SHADING:
+                    case LOCAL_HYPSOMETRIC_SHADING:
                         // apply a color ramp to the elevation value
                         elev = elevationGrid.getValue(col, row);
                         // multiply the elevation color with the gray value of the shading
                         argb = getLinearRGB(elev, minElev, maxElev, gray / 255f);
                         break;
                     case HYPSOMETRIC:
+                    case LOCAL_HYPSOMETRIC:
                         // apply a color ramp to the elevation value
                         elev = elevationGrid.getValue(col, row);
                         argb = getLinearRGB(elev, minElev, maxElev, 1);
                         break;
                 }
                 imageBuffer[row * nCols + col] = argb;
-
             }
         }
     }

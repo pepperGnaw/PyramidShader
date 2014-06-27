@@ -186,6 +186,9 @@ public final class Grid implements Cloneable {
      * Bilinear interpolation. See
      * http://www.geovista.psu.edu/sites/geocomp99/Gc99/082/gc_082.htm "What's
      * the point? Interpolation and extrapolation with a regular grid DEM"
+     * @param x horizontal coordinate
+     * @param y vertical coordinate
+     * @return interpolated value
      */
     public final float getBilinearInterpol(double x, double y) {
 
@@ -389,14 +392,16 @@ public final class Grid implements Cloneable {
     
     /**
      * Returns a descriptive text for GUI display.
-     * @param newLine The line separator. Could be \n, <br>.
+     * @param newLine The line separator. Could be \n, <br> or null.
      * @return 
      */
     public String getDescription(String newLine) {
+        if (newLine == null) {
+            newLine = System.getProperty("line.separator");
+        }
         DecimalFormat f = new DecimalFormat(cellSize < 1 ? "#,##0.0#####" : "#,##0.0");
         DecimalFormat intFormat = new DecimalFormat("#,###");
         StringBuilder sb = new StringBuilder();
-        sb.append(newLine);
         sb.append("Dimension: ");
         sb.append(intFormat.format(getCols()));
         sb.append("\u2006\u00D7\u2006"); // multiplication sign surrounded by small spaces
@@ -421,10 +426,13 @@ public final class Grid implements Cloneable {
     
     /**
      * Returns a descriptive text for GUI display, including min and max values.
-     * @param newLine The line separator. Could be \n, <br>.
+     * @param newLine The line separator. Could be \n, <br> or null.
      * @return 
      */
     public String getDescriptionWithStatistics(String newLine) {
+        if (newLine == null) {
+            newLine = System.getProperty("line.separator");
+        }
         DecimalFormat f = new DecimalFormat("#,##0.######");
         StringBuilder sb = new StringBuilder(this.getDescription(newLine));
         float[] minMax = getMinMax();

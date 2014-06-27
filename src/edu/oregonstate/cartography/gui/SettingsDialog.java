@@ -47,7 +47,11 @@ public class SettingsDialog extends javax.swing.JDialog {
     private edu.oregonstate.cartography.gui.SettingsPanel settingsPanel;
     // End of variables declaration//GEN-END:variables
 
-    void setModel(Model model) {
+    public void setModel(Model model) {
         settingsPanel.setModel(model);
+    }
+    
+    public void modelChanged() {
+        settingsPanel.updateImage(SettingsPanel.RenderSpeed.REGULAR);
     }
 }

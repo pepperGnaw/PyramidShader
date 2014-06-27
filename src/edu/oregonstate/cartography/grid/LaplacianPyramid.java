@@ -11,11 +11,6 @@ public class LaplacianPyramid {
     
     private Grid[] levels;
     
-    /**
-     * weights to merge pyramid levels
-     */
-    private float[] w;
-    
     private static final float wa = 0.4f;
     private static final float wb = 0.25f;
     private static final float wc = 0.05f;
@@ -146,7 +141,7 @@ public class LaplacianPyramid {
 
     /**
      * Expand the size of a grid by a factor 2.
-     *
+     * FIXME: should be multi-threaded
      * @param grid The grid to expand.
      * @param maxCols
      * @param maxRows
@@ -285,10 +280,14 @@ public class LaplacianPyramid {
      * @param highFreq High frequency grid.
      * @param scale
      */
-    public void sumGrids(Grid lowFreqSum, Grid highFreq, float scale) {
+    private void sumGrids(Grid lowFreqSum, Grid highFreq, float scale) {
 
         if (!lowFreqSum.isIdenticalInSize(highFreq)) {
             throw new IllegalArgumentException("grids of different size cannot be summed");
+        }
+        
+        if (scale == 0f) {
+            return;
         }
 
         final int cols = lowFreqSum.getCols();
@@ -335,33 +334,50 @@ public class LaplacianPyramid {
         return difGrid;
     }
 
-    public void setWeights(float[] w) {
-        this.w = Arrays.copyOf(w, w.length);
+    /**
+     * Returns an array with constant weights that can be passed to sumLevels
+     * @param w Default weight, use 1 for fully reconstructed grid.
+     * @return Array with weights. Position 0 contains the weight for the highest
+     * frequency band.
+     */
+    public float[] createConstantWeights(float w) {
+        float[] weights = new float[levels.length];
+        Arrays.fill(weights, w);
+        return weights;
     }
     
     /**
      * Sums the levels of the pyramid to re-synthesize the original image.
      *
-     * @return
+     * @param levelWeights Weights applied when merging pyramid levels. The first
+     * value is the weight for the highest frequency band.
+     * @return Synthesized grid.
      */
-    public Grid sumLevels() {
+    public Grid sumLevels(float[] levelWeights) {
+        if (levelWeights != null && levelWeights.length != levels.length) {
+            throw new IllegalArgumentException("incorrect number of pyramid weights");
+        }
         
         // copy the smallest grid of the pyramid
-        Grid sum = this.levels[this.levels.length - 1].clone();
+        Grid sum = levels[levels.length - 1].clone();
 
-        // The base level weight is always 1.0 (base raised to the power of 0)
-        new GridScaleOperator(1.0F).operate(sum);
-
-        // expand the sum and and add the next larger grids
-        for (int i = this.levels.length - 2; i >= 0; i--) {
-            Grid grid = this.levels[i];
-            sum = LaplacianPyramid.expand(sum, grid.getCols(), grid.getRows());
-            // System.out.println("level: " + i + ",\t weight: " + (w == null ? Float.NaN : w[i]));
-            sumGrids(sum, grid, w == null ? 1f : w[i]);
+        // the weight for the base is usually 1, but might be different for
+        // a high-pass filter
+        if (levelWeights != null) {
+            float w = levelWeights[levels.length - 1];
+            new GridScaleOperator(w).operate(sum, sum);
+            //System.out.println("base level,\t weight: " + w);
         }
-        //return altGrid;
+        
+        // expand the sum and and add the next larger grids
+        for (int i = levels.length - 2; i >= 0; i--) {
+            Grid grid = levels[i];
+            sum = LaplacianPyramid.expand(sum, grid.getCols(), grid.getRows());
+            float w = (levelWeights == null ? 1 : levelWeights[i]);
+            //System.out.println("level: " + i + ",\t weight: " + w);
+            sumGrids(sum, grid, w);
+        }
         return sum;
-
     }
 
     public Grid[] getLevels() {

@@ -7,6 +7,7 @@ import edu.oregonstate.cartography.grid.Model;
 import static edu.oregonstate.cartography.grid.Model.ForegroundVisualization.ILLUMINATED_CONTOURS;
 import edu.oregonstate.cartography.grid.WorldFileExporter;
 import edu.oregonstate.cartography.grid.operators.IlluminatedContoursOperator;
+import static edu.oregonstate.cartography.gui.SettingsPanel.RenderSpeed.REGULAR;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -32,7 +33,7 @@ public class MainWindow extends javax.swing.JFrame {
             + "The grid seems to use a geographic coordinate system.<br>"
             + "Computed shadings and contours will not be correct. <br>"
             + "Please first project the grid to a Cartesian coordinate system.</html>";
-    
+
     private final Model model;
     private SettingsDialog settingsDialog = null;
 
@@ -69,6 +70,8 @@ public class MainWindow extends javax.swing.JFrame {
         javax.swing.JMenuItem openMenuItem = new javax.swing.JMenuItem();
         javax.swing.JPopupMenu.Separator jSeparator1 = new javax.swing.JPopupMenu.Separator();
         saveTerrainMenuItem = new javax.swing.JMenuItem();
+        saveLocalTerrainMenuItem = new javax.swing.JMenuItem();
+        javax.swing.JPopupMenu.Separator jSeparator5 = new javax.swing.JPopupMenu.Separator();
         javax.swing.JMenu saveImageMenu = new javax.swing.JMenu();
         saveTIFFImageMenuItem = new javax.swing.JMenuItem();
         savePNGImageMenuItem = new javax.swing.JMenuItem();
@@ -77,14 +80,14 @@ public class MainWindow extends javax.swing.JFrame {
         savePNGContoursMenuItem = new javax.swing.JMenuItem();
         viewMenu = new javax.swing.JMenu();
         viewResetMenuItem = new javax.swing.JMenuItem();
-        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        javax.swing.JPopupMenu.Separator jSeparator4 = new javax.swing.JPopupMenu.Separator();
         viewZoomInMenuItem = new javax.swing.JMenuItem();
         viewZoomOutMenuItem = new javax.swing.JMenuItem();
         javax.swing.JMenu infoMenu = new javax.swing.JMenu();
         settingsMenuItem = new javax.swing.JMenuItem();
-        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        javax.swing.JPopupMenu.Separator jSeparator3 = new javax.swing.JPopupMenu.Separator();
         terrainInfoMenuItem = new javax.swing.JMenuItem();
-        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        javax.swing.JPopupMenu.Separator jSeparator2 = new javax.swing.JPopupMenu.Separator();
         infoMenuItem = new javax.swing.JMenuItem();
 
         imageResolutionPanel.setLayout(new java.awt.GridBagLayout());
@@ -129,6 +132,15 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         fileMenu.add(saveTerrainMenuItem);
+
+        saveLocalTerrainMenuItem.setText("Save Locally Filtered Terrain Model…");
+        saveLocalTerrainMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveLocalTerrainMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveLocalTerrainMenuItem);
+        fileMenu.add(jSeparator5);
 
         saveImageMenu.setText("Save Image");
 
@@ -286,15 +298,7 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_saveTIFFImageMenuItemActionPerformed
 
     private void saveTerrainMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTerrainMenuItemActionPerformed
-        String filePath = askFile("Save Terrain File", false);    //call up a save file dialog
-        if (filePath != null) {
-            filePath = FileUtils.forceFileNameExtension(filePath, "asc");
-            try {
-                ESRIASCIIGridExporter.export(model.getGeneralizedGrid(), filePath);
-            } catch (IOException ex) {
-                ErrorDialog.showErrorDialog(SAVE_TERRAIN_ERROR_MESSAGE, "Error", ex, this);
-            }
-        }
+        saveTerrain(model.getGeneralizedGrid());
     }//GEN-LAST:event_saveTerrainMenuItemActionPerformed
 
     private void openMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openMenuItemActionPerformed
@@ -404,7 +408,7 @@ public class MainWindow extends javax.swing.JFrame {
                 g.setColor(model.solidColor);
                 g.fillRect(0, 0, w, h);
                 g.dispose();
-                op.renderToImage(image, model.getGeneralizedGrid(), 
+                op.renderToImage(image, model.getGeneralizedGrid(),
                         model.getGeneralizedSlopeGrid(), this);
 
                 if (!isCancelled()) {
@@ -452,6 +456,7 @@ public class MainWindow extends javax.swing.JFrame {
         boolean contoursVisible
                 = model.foregroundVisualization != Model.ForegroundVisualization.NONE;
         saveTerrainMenuItem.setEnabled(gridLoaded);
+        saveLocalTerrainMenuItem.setEnabled(model.backgroundVisualization.isLocal());
         saveTIFFImageMenuItem.setEnabled(gridLoaded);
         savePNGImageMenuItem.setEnabled(gridLoaded);
         saveTIFFContoursMenuItem.setEnabled(contoursVisible);
@@ -464,6 +469,10 @@ public class MainWindow extends javax.swing.JFrame {
         viewZoomInMenuItem.setEnabled(gridLoaded);
         viewZoomOutMenuItem.setEnabled(gridLoaded);
     }//GEN-LAST:event_viewMenuMenuSelected
+
+    private void saveLocalTerrainMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveLocalTerrainMenuItemActionPerformed
+        saveTerrain(model.getLocalGrid());
+    }//GEN-LAST:event_saveLocalTerrainMenuItemActionPerformed
 
     /**
      * Ask the user for a file to read or write.
@@ -508,29 +517,29 @@ public class MainWindow extends javax.swing.JFrame {
         String dialogTitle = "Pyramid Shader";
 
         worker = new SwingWorkerWithProgressIndicator<Void>(this, dialogTitle, "", true) {
-            
+
             @Override
             public void done() {
                 try {
                     // a call to get() will throw an ExecutionException if an 
                     // exception occured in doInBackground
                     get();
-                    model.updateGeneralizedGrid();
+
                     BufferedImage image = model.createDestinationImage(1);
                     navigableImagePanel.setImage(model.renderBackgroundImage(image));
                     if (model.getGrid().getCellSize() < 0.1) {
                         completeProgress();
                         JOptionPane.showMessageDialog(getContentPane(), GEOGRAPHIC_CS_WARNING,
                                 "Pyramid Shader Warning", JOptionPane.WARNING_MESSAGE);
-                } 
+                    }
+                    settingsDialog.modelChanged();
                 } catch (ExecutionException e) {
                     completeProgress();
                     // an exception was thrown in doInBackground
                     String msg = "<html>An error occured when importing the terrain model."
                             + "<br>The file must be in Esri ASCII Grid format.</html>";
                     String title = "Error";
-                    JOptionPane.showMessageDialog(getContentPane(), msg, title,
-                            JOptionPane.ERROR_MESSAGE);
+                    ErrorDialog.showErrorDialog(msg, title, e, getContentPane());
                 } catch (InterruptedException | CancellationException e) {
                 } finally {
                     // hide the progress dialog
@@ -559,11 +568,9 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPanel imageResolutionPanel;
     private javax.swing.JSpinner imageResolutionSpinner;
     private javax.swing.JMenuItem infoMenuItem;
-    private javax.swing.JPopupMenu.Separator jSeparator2;
-    private javax.swing.JPopupMenu.Separator jSeparator3;
-    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JMenuBar menuBar;
     private edu.oregonstate.cartography.gui.NavigableImagePanel navigableImagePanel;
+    private javax.swing.JMenuItem saveLocalTerrainMenuItem;
     private javax.swing.JMenuItem savePNGContoursMenuItem;
     private javax.swing.JMenuItem savePNGImageMenuItem;
     private javax.swing.JMenuItem saveTIFFContoursMenuItem;
@@ -607,5 +614,18 @@ public class MainWindow extends javax.swing.JFrame {
      */
     public void setSettingsDialog(SettingsDialog settingsDialog) {
         this.settingsDialog = settingsDialog;
+    }
+
+    private void saveTerrain(Grid grid) {
+        //call up a save file dialog
+        String filePath = askFile("Save Terrain File", false);
+        if (filePath != null) {
+            filePath = FileUtils.forceFileNameExtension(filePath, "asc");
+            try {
+                ESRIASCIIGridExporter.export(grid, filePath);
+            } catch (IOException ex) {
+                ErrorDialog.showErrorDialog(SAVE_TERRAIN_ERROR_MESSAGE, "Error", ex, this);
+            }
+        }
     }
 }
