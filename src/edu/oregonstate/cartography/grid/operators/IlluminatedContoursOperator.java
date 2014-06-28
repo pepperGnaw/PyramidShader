@@ -270,7 +270,7 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
 
         // Code regarding 'a' vs 'diff' ensures that the contour lines
         // have an equal width throughout the illuminated or shadowed line.
-        double dist = elevation % interval;
+        double dist = Math.abs(elevation) % interval;
         if (dist > a) {
             dist = interval - dist;
         }
