@@ -4,6 +4,8 @@ import static edu.oregonstate.cartography.grid.Model.ForegroundVisualization.ILL
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator;
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization;
 import static edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization.GRAY_SHADING;
+import edu.oregonstate.cartography.grid.operators.GridAddOperator;
+import edu.oregonstate.cartography.grid.operators.GridScaleOperator;
 import edu.oregonstate.cartography.grid.operators.GridScaleToRangeOperator;
 import edu.oregonstate.cartography.grid.operators.GridSlopeOperator;
 import edu.oregonstate.cartography.grid.operators.IlluminatedContoursOperator;
@@ -348,7 +350,7 @@ public class Model implements Cloneable {
             // coloring
             ColorizerOperator colorizer = new ColorizerOperator(backgroundVisualization);
             colorizer.setColors(colorRamp.colors, colorRamp.colorPositions);
-            
+
             Grid terrainGrid;
             if (backgroundVisualization.isLocal()) {
                 terrainGrid = localGridModel.getFilteredGrid();
@@ -490,5 +492,17 @@ public class Model implements Cloneable {
 
     public void setLocalGridStandardDeviationLevels(int levels) {
         localGridModel.setLocalGridStandardDeviationLevels(levels);
+    }
+
+    public void scaleTerrain(float scale) {
+        GridScaleOperator op = new GridScaleOperator(scale);
+        op.operate(grid, grid);
+        setGrid(grid);
+    }
+    
+    public void verticallyOffsetTerrain(float offset) {
+        GridAddOperator op = new GridAddOperator(offset);
+        op.operate(grid, grid);
+        setGrid(grid);
     }
 }
