@@ -12,7 +12,7 @@ public class GridCopyOperator extends ThreadedGridOperator {
     protected void operate(Grid src, Grid dst, int startRow, int endRow) {
         for (int row = startRow; row < endRow; ++row) {
             float[] srcArray = src.getGrid()[row];
-            float[] dstArray = src.getGrid()[row];
+            float[] dstArray = dst.getGrid()[row];
             System.arraycopy(srcArray, 0, dstArray, 0, srcArray.length);
         }
     }
