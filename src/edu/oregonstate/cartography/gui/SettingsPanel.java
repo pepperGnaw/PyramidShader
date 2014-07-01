@@ -215,16 +215,20 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursCardPanel = new TransparentMacPanel();
         contoursEmptyPanel = new TransparentMacPanel();
         contoursSettingsPanel = new TransparentMacPanel();
+        javax.swing.JLabel contoursIlluminatedLineWidthLabel = new javax.swing.JLabel();
+        contoursIlluminatedLineWidthSlider = new javax.swing.JSlider();
+        javax.swing.JLabel contoursShadwoLineWidthSlider = new javax.swing.JLabel();
         contoursShadowLineWidthSlider = new javax.swing.JSlider();
         javax.swing.JLabel contoursMinLineWidthLabel = new javax.swing.JLabel();
-        contoursIntervalTextBox = new javax.swing.JFormattedTextField();
-        contoursGradientSlider = new javax.swing.JSlider();
-        javax.swing.JLabel contoursShadwoLineWidthSlider = new javax.swing.JLabel();
-        contoursIlluminatedLineWidthSlider = new javax.swing.JSlider();
-        javax.swing.JLabel contoursIntervalLabel = new javax.swing.JLabel();
-        javax.swing.JLabel contoursIlluminatedLineWidthLabel = new javax.swing.JLabel();
         contoursMinLineWidthSlider = new javax.swing.JSlider();
+        javax.swing.JLabel contoursIntervalLabel = new javax.swing.JLabel();
+        contoursIntervalTextBox = new javax.swing.JFormattedTextField();
         contoursGradientLabel = new javax.swing.JLabel();
+        contoursGradientSlider = new javax.swing.JSlider();
+        javax.swing.JLabel contoursDespeckleLabel = new javax.swing.JLabel();
+        contoursDespeckleSlider = new javax.swing.JSlider();
+        javax.swing.JLabel contoursTransitionLabel = new javax.swing.JLabel();
+        contoursTransitionSlider = new javax.swing.JSlider();
 
         colorPopupMenu.setLightWeightPopupEnabled(false);
 
@@ -620,6 +624,51 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         contoursSettingsPanel.setLayout(new java.awt.GridBagLayout());
 
+        contoursIlluminatedLineWidthLabel.setText("Illuminated Line Width");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursIlluminatedLineWidthLabel, gridBagConstraints);
+
+        contoursIlluminatedLineWidthSlider.setMajorTickSpacing(10);
+        contoursIlluminatedLineWidthSlider.setMaximum(50);
+        contoursIlluminatedLineWidthSlider.setMinorTickSpacing(5);
+        contoursIlluminatedLineWidthSlider.setPaintLabels(true);
+        contoursIlluminatedLineWidthSlider.setPaintTicks(true);
+        contoursIlluminatedLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
+        contoursIlluminatedLineWidthSlider.setValue(0);
+        {
+            java.util.Hashtable labels = contoursIlluminatedLineWidthSlider.createStandardLabels(10);
+            java.util.Enumeration e = labels.elements();
+            while(e.hasMoreElements()) {
+                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
+                if (comp instanceof javax.swing.JLabel) {
+                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
+                    int sliderValue = Integer.parseInt(label.getText());
+                    label.setText(Integer.toString(sliderValue / 10));
+                }
+            }
+            contoursIlluminatedLineWidthSlider.setLabelTable(labels);
+        }
+        contoursIlluminatedLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                contoursIlluminatedLineWidthSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        contoursSettingsPanel.add(contoursIlluminatedLineWidthSlider, gridBagConstraints);
+
+        contoursShadwoLineWidthSlider.setText("Shadowed Line Width");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursShadwoLineWidthSlider, gridBagConstraints);
+
         contoursShadowLineWidthSlider.setMajorTickSpacing(10);
         contoursShadowLineWidthSlider.setMaximum(50);
         contoursShadowLineWidthSlider.setMinorTickSpacing(5);
@@ -658,101 +707,6 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursMinLineWidthLabel, gridBagConstraints);
 
-        contoursIntervalTextBox.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
-        contoursIntervalTextBox.setToolTipText("Contour interval");
-        contoursIntervalTextBox.setPreferredSize(new java.awt.Dimension(120, 28));
-        contoursIntervalTextBox.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                contoursIntervalTextBoxPropertyChange(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        contoursSettingsPanel.add(contoursIntervalTextBox, gridBagConstraints);
-
-        contoursGradientSlider.setMajorTickSpacing(10);
-        contoursGradientSlider.setMaximum(50);
-        contoursGradientSlider.setMinorTickSpacing(5);
-        contoursGradientSlider.setPaintLabels(true);
-        contoursGradientSlider.setPaintTicks(true);
-        contoursGradientSlider.setToolTipText("A gradient between black and white is created within this angle.");
-        contoursGradientSlider.setValue(0);
-        {
-            java.util.Hashtable labels = contoursGradientSlider.createStandardLabels(10);
-            java.util.Enumeration e = labels.elements();
-            while(e.hasMoreElements()) {
-                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
-                if (comp instanceof javax.swing.JLabel) {
-                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
-                    label.setText(label.getText() + "\u00b0");
-                }
-            }
-            contoursGradientSlider.setLabelTable(labels);
-        }
-        contoursGradientSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                contoursGradientSliderStateChanged(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
-        contoursSettingsPanel.add(contoursGradientSlider, gridBagConstraints);
-
-        contoursShadwoLineWidthSlider.setText("Shadowed Line Width");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        contoursSettingsPanel.add(contoursShadwoLineWidthSlider, gridBagConstraints);
-
-        contoursIlluminatedLineWidthSlider.setMajorTickSpacing(10);
-        contoursIlluminatedLineWidthSlider.setMaximum(50);
-        contoursIlluminatedLineWidthSlider.setMinorTickSpacing(5);
-        contoursIlluminatedLineWidthSlider.setPaintLabels(true);
-        contoursIlluminatedLineWidthSlider.setPaintTicks(true);
-        contoursIlluminatedLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
-        contoursIlluminatedLineWidthSlider.setValue(0);
-        {
-            java.util.Hashtable labels = contoursIlluminatedLineWidthSlider.createStandardLabels(10);
-            java.util.Enumeration e = labels.elements();
-            while(e.hasMoreElements()) {
-                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
-                if (comp instanceof javax.swing.JLabel) {
-                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
-                    int sliderValue = Integer.parseInt(label.getText());
-                    label.setText(Integer.toString(sliderValue / 10));
-                }
-            }
-            contoursIlluminatedLineWidthSlider.setLabelTable(labels);
-        }
-        contoursIlluminatedLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                contoursIlluminatedLineWidthSliderStateChanged(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        contoursSettingsPanel.add(contoursIlluminatedLineWidthSlider, gridBagConstraints);
-
-        contoursIntervalLabel.setText("Interval");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        contoursSettingsPanel.add(contoursIntervalLabel, gridBagConstraints);
-
-        contoursIlluminatedLineWidthLabel.setText("Illuminated Line Width");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        contoursSettingsPanel.add(contoursIlluminatedLineWidthLabel, gridBagConstraints);
-
         contoursMinLineWidthSlider.setMajorTickSpacing(10);
         contoursMinLineWidthSlider.setMaximum(50);
         contoursMinLineWidthSlider.setMinorTickSpacing(5);
@@ -784,12 +738,120 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         contoursSettingsPanel.add(contoursMinLineWidthSlider, gridBagConstraints);
 
+        contoursIntervalLabel.setText("Interval");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursIntervalLabel, gridBagConstraints);
+
+        contoursIntervalTextBox.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter()));
+        contoursIntervalTextBox.setToolTipText("Contour interval");
+        contoursIntervalTextBox.setPreferredSize(new java.awt.Dimension(120, 28));
+        contoursIntervalTextBox.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                contoursIntervalTextBoxPropertyChange(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        contoursSettingsPanel.add(contoursIntervalTextBox, gridBagConstraints);
+
         contoursGradientLabel.setText("Gradient Angle");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursGradientLabel, gridBagConstraints);
+
+        contoursGradientSlider.setMajorTickSpacing(10);
+        contoursGradientSlider.setMaximum(50);
+        contoursGradientSlider.setMinorTickSpacing(5);
+        contoursGradientSlider.setPaintLabels(true);
+        contoursGradientSlider.setPaintTicks(true);
+        contoursGradientSlider.setToolTipText("A gradient between black and white is created within this angle.");
+        contoursGradientSlider.setValue(0);
+        {
+            java.util.Hashtable labels = contoursGradientSlider.createStandardLabels(10);
+            java.util.Enumeration e = labels.elements();
+            while(e.hasMoreElements()) {
+                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
+                if (comp instanceof javax.swing.JLabel) {
+                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
+                    label.setText(label.getText() + "\u00b0");
+                }
+            }
+            contoursGradientSlider.setLabelTable(labels);
+        }
+        contoursGradientSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                contoursGradientSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        contoursSettingsPanel.add(contoursGradientSlider, gridBagConstraints);
+
+        contoursDespeckleLabel.setText("Despeckle");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursDespeckleLabel, gridBagConstraints);
+
+        contoursDespeckleSlider.setMajorTickSpacing(25);
+        contoursDespeckleSlider.setMinorTickSpacing(5);
+        contoursDespeckleSlider.setPaintLabels(true);
+        contoursDespeckleSlider.setPaintTicks(true);
+        contoursDespeckleSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                contoursDespeckleSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        contoursSettingsPanel.add(contoursDespeckleSlider, gridBagConstraints);
+
+        contoursTransitionLabel.setText("Transition");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursTransitionLabel, gridBagConstraints);
+
+        contoursTransitionSlider.setMajorTickSpacing(45);
+        contoursTransitionSlider.setMaximum(180);
+        contoursTransitionSlider.setMinorTickSpacing(15);
+        contoursTransitionSlider.setPaintLabels(true);
+        contoursTransitionSlider.setPaintTicks(true);
+        contoursTransitionSlider.setValue(90);
+        {
+            java.util.Hashtable labels = contoursTransitionSlider.createStandardLabels(45);
+            java.util.Enumeration e = labels.elements();
+            while(e.hasMoreElements()) {
+                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
+                if (comp instanceof javax.swing.JLabel) {
+                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
+                    label.setText(label.getText() + "\u00b0");
+                }
+            }
+            contoursTransitionSlider.setLabelTable(labels);
+        }
+        contoursTransitionSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                contoursTransitionSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        contoursSettingsPanel.add(contoursTransitionSlider, gridBagConstraints);
 
         contoursCardPanel.add(contoursSettingsPanel, "contoursSettingsCard");
 
@@ -819,7 +881,9 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursMinLineWidthSlider.setValue((int) Math.round(m.contoursMinWidth * 10));
         contoursGradientSlider.setValue(m.contoursGradientAngle);
         contoursIntervalTextBox.setValue(m.contoursInterval);
-
+        contoursDespeckleSlider.setValue((int)Math.round(m.contoursAspectGaussBlur * 20D));
+        contoursTransitionSlider.setValue(m.contoursTransitionAngle);
+        
         verticalExaggerationSlider.setValue(Math.round(m.shadingVerticalExaggeration * 10f));
         colorGradientSlider.setValues(m.colorRamp.colorPositions, m.colorRamp.colors);
         solidColorButton.setColor(m.solidColor);
@@ -1044,6 +1108,16 @@ public class SettingsPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_localGridLowPassSliderStateChanged
 
+    private void contoursDespeckleSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursDespeckleSliderStateChanged
+        model.contoursAspectGaussBlur = contoursDespeckleSlider.getValue() / 20D;
+        updateImage(contoursDespeckleSlider.getValueIsAdjusting() ? FAST : REGULAR);
+    }//GEN-LAST:event_contoursDespeckleSliderStateChanged
+
+    private void contoursTransitionSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursTransitionSliderStateChanged
+        model.contoursTransitionAngle = contoursTransitionSlider.getValue();
+        updateImage(contoursTransitionSlider.getValueIsAdjusting() ? FAST : REGULAR);
+    }//GEN-LAST:event_contoursTransitionSliderStateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSlider azimuthSlider;
     private javax.swing.JPanel colorGradientPanel;
@@ -1052,6 +1126,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private edu.oregonstate.cartography.gui.MenuToggleButton colorPresetsButton;
     private javax.swing.JPanel contoursCardPanel;
     private javax.swing.JComboBox contoursComboBox;
+    private javax.swing.JSlider contoursDespeckleSlider;
     private javax.swing.JPanel contoursEmptyPanel;
     private javax.swing.JLabel contoursGradientLabel;
     private javax.swing.JSlider contoursGradientSlider;
@@ -1061,6 +1136,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JPanel contoursPanel;
     private javax.swing.JPanel contoursSettingsPanel;
     private javax.swing.JSlider contoursShadowLineWidthSlider;
+    private javax.swing.JSlider contoursTransitionSlider;
     private javax.swing.JLabel generalizationDetaiIndicator;
     private javax.swing.JSlider generalizationDetailSlider;
     private javax.swing.JLabel generalizationInfoLabel;

@@ -170,6 +170,16 @@ public class Model implements Cloneable {
     public int contoursIllluminatedGray = 255;
 
     /**
+     * standard deviation of Gaussian blur filter to despeckle contour lines
+     */
+    public double contoursAspectGaussBlur;
+
+    /**
+     * transition angle between illuminated and shaded contour lines
+     */
+    public int contoursTransitionAngle = 90;
+
+    /**
      * localGridModel encapsulates the settings and cashed intermediate results
      * for computing a locally filtered grid for local hypsometric tinting.
      */
@@ -458,7 +468,9 @@ public class Model implements Cloneable {
                 azimuth,
                 contoursInterval,
                 contoursGradientAngle,
-                contoursIllluminatedGray);
+                contoursIllluminatedGray,
+                contoursAspectGaussBlur,
+                contoursTransitionAngle);
     }
 
     /**
@@ -499,7 +511,7 @@ public class Model implements Cloneable {
         op.operate(grid, grid);
         setGrid(grid);
     }
-    
+
     public void verticallyOffsetTerrain(float offset) {
         GridAddOperator op = new GridAddOperator(offset);
         op.operate(grid, grid);

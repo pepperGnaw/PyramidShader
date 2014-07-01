@@ -43,12 +43,26 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
     // contour interval
     private final double interval;
 
+    // a gradient between black and white is applied inside this transition angle
+    // in degree
     private final int gradientAngle;
 
+    // standard deviation of Gaussian blur filter applied to grid to create smoothGrid
+    private final double aspectGaussBlur;
+    
+    // a low-pass version of the source grid. Created with standard deviation
+    // of aspectGaussBlur
+    private Grid smoothGrid;
+    
     // gray value of illuminated contours
     private final int illluminatedGray;
-    private int[] imageBuffer;
+    
+    // transition angle between illuminated and shaded contour lines, usually 90 degrees
+    private final int transitionAngle;
 
+    // FIXME comment
+    private int[] imageBuffer;
+    
     /**
      *
      * @param illuminated
@@ -60,6 +74,8 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
      * @param interval
      * @param gradientAngle
      * @param illluminatedGray
+     * @param aspectGaussBlur
+     * @param transitionAngle
      */
     public IlluminatedContoursOperator(boolean illuminated,
             double shadowWidth,
@@ -69,7 +85,9 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
             double azimuth,
             double interval,
             int gradientAngle,
-            int illluminatedGray) {
+            int illluminatedGray,
+            double aspectGaussBlur,
+            int transitionAngle) {
         this.illuminated = illuminated;
         this.shadowWidth = shadowWidth;
         this.illuminatedWidth = illuminatedWidth;
@@ -79,7 +97,8 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         this.interval = interval;
         this.gradientAngle = gradientAngle;
         this.illluminatedGray = illluminatedGray;
-
+        this.aspectGaussBlur = aspectGaussBlur;
+        this.transitionAngle = transitionAngle;
     }
 
     /**
@@ -98,6 +117,7 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         this.image = destinationImage;
         this.progress = progress;
         this.imageBuffer = ((DataBufferInt) (image.getRaster().getDataBuffer())).getData();
+        this.smoothGrid = new GridGaussLowPassOperator(aspectGaussBlur).operate(grid);
         super.operate(grid, slopeGrid);
     }
 
@@ -114,7 +134,7 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         startRow = Math.max(1, startRow);
         endRow = Math.min(src.getRows() - 2, endRow);
         int cols = src.getCols();
-        
+
         int scale = image.getWidth() / src.getCols();
         if (scale == 1) {
             for (int row = startRow; row < endRow; row++) {
@@ -125,9 +145,9 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         } else {
             // only report progress if this is the first chunk of the image
             // all chunks are the same size, but are rendered in different threads.
-            boolean reportProgress = startRow == 1 
+            boolean reportProgress = startRow == 1
                     && progress instanceof SwingWorkerWithProgressIndicator;
-            
+
             for (int row = startRow; row < endRow; row++) {
                 // stop rendering if the user canceled
                 if (progress != null && progress.isCancelled()) {
@@ -158,10 +178,11 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
      * @param row The row in the source grid.
      */
     private void illuminatedContours(Grid src, int col, int row) {
-        double slopeVal = src.getSlope(col, row);
-        double aspectVal = (src.getAspect(col, row) + Math.PI) * 180 / Math.PI;
-        double demVal = src.getValue(col, row);
-        int g = computeGray(demVal, aspectVal, slopeVal, src.getCellSize());
+        double elevation = src.getValue(col, row);
+        double smoothAspect = smoothGrid.getAspect(col, row);
+        smoothAspect = (smoothAspect + Math.PI) * 180 / Math.PI;
+        double slope = src.getSlope(col, row);
+        int g = computeGray(elevation, smoothAspect, slope, src.getCellSize());
         if (g != CONTOURS_TRANSPARENT) {
             int argb = (int) g | ((int) g << 8) | ((int) g << 16) | 0xFF000000;
             imageBuffer[row * image.getWidth() + col] = argb;
@@ -191,25 +212,11 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
                 // convert column and row to geographic coordinates
                 double x = west + ((col + (double) c / scale) * cellSize);
                 double y = north - ((row + (double) r / scale) * cellSize);
-
-                // compute interpolated slope, aspect and elevation for subcells
-                // the following code is equal to calling getSlope and getAspect,
-                // but avoids interpolating the same altitude values twice.
-                // double slopeVal = src.getSlope(x, y, samplingDist);
-                // double aspectVal = (src.getAspect(x, y, samplingDist) + Math.PI) * 180 / Math.PI;
-                double center = src.getBilinearInterpol(x, y);
-                double w = src.getBilinearInterpol(x - samplingDist, y);
-                double e = src.getBilinearInterpol(x + samplingDist, y);
-                double s = src.getBilinearInterpol(x, y - samplingDist);
-                double n = src.getBilinearInterpol(x, y + samplingDist);
-                double dx = e - w;
-                double dy = n - s;
-
+                double elevation = src.getBilinearInterpol(x, y);
+                double smoothAspect = smoothGrid.getAspect(x, y, samplingDist);
+                smoothAspect = (smoothAspect + Math.PI) * 180 / Math.PI;
                 double slopeVal = slopeGrid.getBilinearInterpol(x, y);
-                double aspectVal = Math.atan2(dy, dx);
-                aspectVal = (aspectVal + Math.PI) * 180 / Math.PI;
-
-                int g = computeGray(center, aspectVal, slopeVal, cellSize);
+                int g = computeGray(elevation, smoothAspect, slopeVal, cellSize);
                 if (g != CONTOURS_TRANSPARENT) {
                     int argb = (int) g | ((int) g << 8) | ((int) g << 16) | 0xFF000000;
                     int imageCol = col * scale + c;
@@ -227,36 +234,31 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
 
     /**
      *
-     * @param illuminationAzimuth angle of illumination from north in clockwise
-     * direction
-     * @param aspectAngle the aspect angle, from aspectGrid
-     * @return the minimum angle between the two vectors
+     * @param illumination angle of illumination, from east counterclockwise
+     * @param aspect the aspect angle, from east counterclockwise, in degrees
+     * @return the minimum angle between the two vectors, in degrees
      */
-    private double getAngleDifference(double illuminationAzimuth, double aspectAngle) {
-        // convert azimuth angle to geometric angle, from east counterclockwise
-        double geomAngle = 90 - illuminationAzimuth;
-        double angleDifference;
-        angleDifference = Math.abs((Math.abs(geomAngle - aspectAngle) + 180) % 360 - 180);
-        return angleDifference;
+    private static double getAngleDifference(double illumination, double aspect) {
+        return Math.abs((Math.abs(illumination - aspect) + 180) % 360 - 180);
     }
 
     /**
      * Compute the gray value for the illuminated contour line image
      *
      * @param elevation Elevation of the point.
-     * @param aspect Aspect of the point.
+     * @param aspect Aspect of the point
      * @param slope Slope of the point.
      * @param cellSize
      * @return Gray value between 0 and 255.
      */
     public int computeGray(double elevation, double aspect, double slope, double cellSize) {
-
+        // convert azimuth angle to geometric angle, from east counterclockwise
+        double illumination = 90 - azimuth;
         // calculate minumum angle between illumination angle and aspect
-        double angleDiff = getAngleDifference(azimuth, aspect);
-
+        double angleDiff = getAngleDifference(illumination, aspect);
         // set 'a' based on the angle distance from the angle of illumination.
         double a;
-        if (angleDiff > 90) {
+        if (angleDiff > transitionAngle) {
             a = shadowWidth * slope * cellSize;
         } else {
             a = illuminatedWidth * slope * cellSize;
@@ -276,12 +278,15 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         }
 
         if (a > dist) {
-            if (angleDiff >= (90 + gradientAngle)) {
+            if (angleDiff >= (transitionAngle + gradientAngle)) {
+                // shaded side
                 return 0; // black
-            } else if (angleDiff <= (90 - gradientAngle)) {
+            } else if (angleDiff <= (transitionAngle - gradientAngle)) {
+                // illuminated side
                 return illuminated ? illluminatedGray : 0;
-            } else if (angleDiff > (90 - gradientAngle) && angleDiff < (90 + gradientAngle)) {
-                return (int) ((angleDiff - (90 - gradientAngle)) / ((90 + gradientAngle) - (90 - gradientAngle)) * (-255) + 255);
+            } else {
+                // gradient between shaded and illuminated side
+                return (int) ((90 - angleDiff - gradientAngle) / (2 * gradientAngle) * 255 + 255);
             }
         }
         return CONTOURS_TRANSPARENT;
