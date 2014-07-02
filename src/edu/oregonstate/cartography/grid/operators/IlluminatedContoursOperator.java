@@ -49,20 +49,20 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
 
     // standard deviation of Gaussian blur filter applied to grid to create smoothGrid
     private final double aspectGaussBlur;
-    
+
     // a low-pass version of the source grid. Created with standard deviation
     // of aspectGaussBlur
     private Grid smoothGrid;
-    
+
     // gray value of illuminated contours
     private final int illluminatedGray;
-    
+
     // transition angle between illuminated and shaded contour lines, usually 90 degrees
     private final int transitionAngle;
 
-    // FIXME comment
+    // pixel buffer to render to
     private int[] imageBuffer;
-    
+
     /**
      *
      * @param illuminated
@@ -233,13 +233,15 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
     }
 
     /**
+     * Returns the smallest angle between two angles
      *
-     * @param illumination angle of illumination, from east counterclockwise
-     * @param aspect the aspect angle, from east counterclockwise, in degrees
-     * @return the minimum angle between the two vectors, in degrees
+     * @param a angle from east counterclockwise in degrees
+     * @param b angle from east counterclockwise in degrees
+     * @return The minimum angle between the two angles in degrees
      */
-    private static double getAngleDifference(double illumination, double aspect) {
-        return Math.abs((Math.abs(illumination - aspect) + 180) % 360 - 180);
+    private static double smallestAngleDiff(double a, double b) {
+        final double d = Math.abs(a - b) % 360.;
+        return (d > 180.) ? 360. - d : d;
     }
 
     /**
@@ -255,7 +257,7 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         // convert azimuth angle to geometric angle, from east counterclockwise
         double illumination = 90 - azimuth;
         // calculate minumum angle between illumination angle and aspect
-        double angleDiff = getAngleDifference(illumination, aspect);
+        double angleDiff = smallestAngleDiff(illumination, aspect);
         // set 'a' based on the angle distance from the angle of illumination.
         double a;
         if (angleDiff > transitionAngle) {
@@ -286,7 +288,8 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
                 return illuminated ? illluminatedGray : 0;
             } else {
                 // gradient between shaded and illuminated side
-                return (int) ((90 - angleDiff - gradientAngle) / (2 * gradientAngle) * 255 + 255);
+                double d = transitionAngle + gradientAngle - angleDiff;
+                return (int) (d / (2 * gradientAngle) * 255);
             }
         }
         return CONTOURS_TRANSPARENT;
