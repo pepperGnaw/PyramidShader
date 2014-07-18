@@ -289,7 +289,7 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
             } else {
                 // gradient between shaded and illuminated side
                 double d = transitionAngle + gradientAngle - angleDiff;
-                return (int) (d / (2 * gradientAngle) * 255);
+                return (int) (d / (2. * gradientAngle) * 255.);
             }
         }
         return CONTOURS_TRANSPARENT;
