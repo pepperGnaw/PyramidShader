@@ -434,7 +434,7 @@ public class MainWindow extends javax.swing.JFrame {
      */
     private void exportContours(final String filePath, final String imageFormat, final int scale) {
         SwingWorkerWithProgressIndicator worker;
-        String dialogTitle = "Illuminated Contours Export";
+        String dialogTitle = "Contours Export";
         worker = new SwingWorkerWithProgressIndicator<Void>(this, dialogTitle, "", true) {
             @Override
             public void done() {
@@ -499,7 +499,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         worker.setMaxTimeWithoutDialogMilliseconds(500);
         worker.setIndeterminate(false);
-        worker.setMessage("Computing illuminated contours image");
+        worker.setMessage("Computing contours image");
         worker.execute();
     }
 
