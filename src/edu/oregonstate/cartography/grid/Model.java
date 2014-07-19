@@ -95,7 +95,7 @@ public class Model implements Cloneable {
      * 1 (hence no generalization). With +1 the weigh for all
      * generalizationMaxLevels is 0.
      */
-    private double generalizationDetails = -0.3;
+    private double generalizationDetails = -0.8;
 
     /**
      * illumination azimuth
@@ -140,18 +140,18 @@ public class Model implements Cloneable {
     /**
      * line width of illuminated contours (relative to cell size)
      */
-    public double contoursIlluminatedWidth = 0.8;
+    public double contoursIlluminatedWidth = 0.5;
 
     /**
      * line width of shaded contours (relative to cell size)
      */
-    public double contoursShadowWidth = 1.5;
+    public double contoursShadowWidth = 0.5;
 
     /**
      * contour line widths are never smaller than this value (relative to cell
      * size)
      */
-    public double contoursMinWidth = 0.5;
+    public double contoursMinWidth = 0.1;
 
     /**
      * continuously vary contour line width with aspect angle

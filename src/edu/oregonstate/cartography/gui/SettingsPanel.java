@@ -232,6 +232,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursDespeckleSlider = new javax.swing.JSlider();
         javax.swing.JLabel contoursTransitionLabel = new javax.swing.JLabel();
         contoursTransitionSlider = new javax.swing.JSlider();
+        jLabel4 = new javax.swing.JLabel();
 
         colorPopupMenu.setLightWeightPopupEnabled(false);
 
@@ -883,6 +884,16 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         contoursSettingsPanel.add(contoursTransitionSlider, gridBagConstraints);
 
+        jLabel4.setFont(jLabel4.getFont().deriveFont(jLabel4.getFont().getSize()-2f));
+        jLabel4.setText("Line widths are relative to grid cell size.");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        contoursSettingsPanel.add(jLabel4, gridBagConstraints);
+
         contoursCardPanel.add(contoursSettingsPanel, "contoursSettingsCard");
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1189,6 +1200,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JPanel generalizationPanel;
     private javax.swing.JPanel illuminatedContoursPanel;
     private javax.swing.JPanel illuminationPanel;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JSlider localGridLowPassSlider;
     private javax.swing.JSlider localGridStandardDeviationFilterSizeSlider;
     private javax.swing.JPanel localHypsoPanel;
