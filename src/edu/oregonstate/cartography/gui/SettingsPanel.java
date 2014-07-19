@@ -72,18 +72,20 @@ public class SettingsPanel extends javax.swing.JPanel {
                     get();
 
                     BufferedImage displayImage = mainWindow.getImage();
+                    int w = displayImage.getWidth();
+                    int h = displayImage.getHeight();
                     Graphics g = displayImage.getGraphics();
-                    g.drawImage(backgroundImage, 0, 0, null);
+                    g.drawImage(backgroundImage, 0, 0, w, h, null);
 
                     // copy foreground image into the display image if required.
                     if (backgroundImage != foregroundImage) {
                         BufferedImage img = ImageUtils.getScaledInstance(foregroundImage,
                                 displayImage.getWidth(), displayImage.getHeight(),
                                 RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
-                        g.drawImage(img, 0, 0, null);
+                        g.drawImage(img, 0, 0, w, h, null);
                     }
                     g.dispose();
-                    mainWindow.setImage(displayImage);
+                    mainWindow.repaintImage();
                 }
             } catch (Exception ignore) {
             }

@@ -9,6 +9,8 @@ import edu.oregonstate.cartography.grid.WorldFileExporter;
 import edu.oregonstate.cartography.grid.operators.IlluminatedContoursOperator;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -644,15 +646,37 @@ public class MainWindow extends javax.swing.JFrame {
                     // exception occured in doInBackground
                     get();
 
-                    BufferedImage image = model.createDestinationImage(1);
-                    navigableImagePanel.setImage(model.renderBackgroundImage(image));
+                    // compute a scale factor for the display image
+                    // this makes sure contour lines for small grids do not 
+                    // appear overly pixelated
+                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                    int screenWidth = gd.getDisplayMode().getWidth();
+                    int screenHeight = gd.getDisplayMode().getHeight();
+                    int imageScaleFactor = 1;
+                    int gridWidth = model.getGrid().getCols();
+                    int gridHeight = model.getGrid().getRows();
+                    double heightRatio = (double)screenHeight / gridHeight;
+                    double widthRatio = (double)screenWidth / gridWidth;
+                    double maxRatio = Math.max(heightRatio, widthRatio);
+                    if (maxRatio > 1) {
+                        imageScaleFactor = (int)Math.ceil(maxRatio);
+                    }
+                    // initialize the display image
+                    BufferedImage image = model.createDestinationImage(imageScaleFactor);
+                    navigableImagePanel.setImage(image);
+
+                    // warning if the grid seems to be in geographic coordinates
                     if (model.getGrid().getCellSize() < 0.1) {
+                        // hide the progress dialog
                         completeProgress();
                         JOptionPane.showMessageDialog(getContentPane(), GEOGRAPHIC_CS_WARNING,
                                 "Pyramid Shader Warning", JOptionPane.WARNING_MESSAGE);
                     }
+
+                    // this will render the image
                     settingsDialog.modelChanged();
                 } catch (ExecutionException e) {
+                    // hide the progress dialog
                     completeProgress();
                     // an exception was thrown in doInBackground
                     String msg = "<html>An error occured when importing the terrain model."
@@ -717,14 +741,8 @@ public class MainWindow extends javax.swing.JFrame {
         return model;
     }
 
-    public void setImage(BufferedImage image) {
-        // setImage changes the current zoom level and the central point
-        // if possible avoid calling setImage therefore.
-        if (image == navigableImagePanel.getImage()) {
-            navigableImagePanel.repaint();
-        } else {
-            navigableImagePanel.setImage(image);
-        }
+    public void repaintImage() {
+        navigableImagePanel.repaint();
     }
 
     public BufferedImage getImage() {
