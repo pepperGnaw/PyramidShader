@@ -3,7 +3,6 @@ package edu.oregonstate.cartography.grid;
 import static edu.oregonstate.cartography.grid.Model.ForegroundVisualization.ILLUMINATED_CONTOURS;
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator;
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization;
-import static edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization.GRAY_SHADING;
 import edu.oregonstate.cartography.grid.operators.GridAddOperator;
 import edu.oregonstate.cartography.grid.operators.GridScaleOperator;
 import edu.oregonstate.cartography.grid.operators.GridScaleToRangeOperator;
@@ -115,7 +114,7 @@ public class Model implements Cloneable {
     /**
      * terrain coloring in the background (shading, hypsometric tints, etc)
      */
-    public ColorVisualization backgroundVisualization = GRAY_SHADING;
+    public ColorVisualization backgroundVisualization = ColorVisualization.GRAY_SHADING;
 
     /**
      * terrain visualization in the foreground (contours)

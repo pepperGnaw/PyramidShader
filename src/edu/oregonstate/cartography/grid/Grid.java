@@ -6,9 +6,7 @@
  */
 package edu.oregonstate.cartography.grid;
 
-import java.io.*;
 import java.text.DecimalFormat;
-import java.util.StringTokenizer;
 
 /**
  * The Grid class models regularly spaced values, for example a digital
@@ -68,84 +66,6 @@ public final class Grid implements Cloneable {
 
         this.cellSize = cellSize;
         this.grid = new float[rows][cols];
-    }
-
-    /**
-     * Read a Grid from a file in ESRI ASCII format.
-     *
-     * @param filePath A path to the file to be read.
-     * @throws java.io.IOException Throws IOException if the grid cannot be
-     * read.
-     */
-    public Grid(String filePath) throws IOException {
-        float noDataValue = 0.f;
-
-        BufferedReader reader = null;
-        int cols = 0;
-        int rows = 0;
-        try {
-            File file = new File(filePath);
-            reader = new BufferedReader(
-                    new InputStreamReader(new FileInputStream(file)));
-
-            while (true) {
-                String line = reader.readLine();
-                if (line == null) {
-                    break;
-                }
-                StringTokenizer tokenizer = new StringTokenizer(line, " \t");
-                String str = tokenizer.nextToken().trim().toLowerCase();
-
-                if (str.equals("ncols")) {
-                    cols = Integer.parseInt(tokenizer.nextToken());
-                } else if (str.equals("nrows")) {
-                    rows = Integer.parseInt(tokenizer.nextToken());
-                } else if (str.equals("xllcenter")) {
-                    this.west = Double.parseDouble(tokenizer.nextToken());
-                } else if (str.equals("yllcenter")) {
-                    this.south = Double.parseDouble(tokenizer.nextToken());
-                } else if (str.equals("cellsize")) {
-                    this.cellSize = Float.parseFloat(tokenizer.nextToken());
-                } else if (str.equals("nodata_value")) {
-                    noDataValue = Float.parseFloat(tokenizer.nextToken());
-                    break;
-                }
-            }
-
-            // test if valid values have been found
-            if (cols <= 0 || rows <= 0 || cellSize <= 0.f) {
-                throw new java.io.IOException();
-            }
-
-            // create a grid of float values
-            grid = new float[rows][cols];
-
-            // Read values of the grid. 
-            // Rows are stored from top to bottom in the file.
-            for (int row = 0; row < rows; row++) {
-
-                String line = reader.readLine();
-                StringTokenizer tokenizer = new StringTokenizer(line, " ");
-
-                for (int col = 0; col < cols; col++) {
-
-                    float v = Float.parseFloat(tokenizer.nextToken());
-                    if (v == noDataValue) {
-                        setValue(Float.NaN, col, row);
-                    } else {
-                        setValue(v, col, row);
-                    }
-                }
-            }
-
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception e) {
-                }
-            }
-        }
     }
 
     /**

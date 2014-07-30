@@ -2,6 +2,7 @@ package edu.oregonstate.cartography.gui;
 
 import edu.oregonstate.cartography.app.FileUtils;
 import edu.oregonstate.cartography.grid.ESRIASCIIGridExporter;
+import edu.oregonstate.cartography.grid.EsriASCIIGridReader;
 import edu.oregonstate.cartography.grid.Grid;
 import edu.oregonstate.cartography.grid.Model;
 import static edu.oregonstate.cartography.grid.Model.ForegroundVisualization.ILLUMINATED_CONTOURS;
@@ -694,7 +695,8 @@ public class MainWindow extends javax.swing.JFrame {
             protected Void doInBackground() throws Exception {
                 start();
                 //import the DEM and create pyramids
-                model.setGrid(new Grid(filePath));
+                Grid grid = EsriASCIIGridReader.read(filePath);
+                model.setGrid(grid);
                 return null;
             }
 
