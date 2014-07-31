@@ -60,12 +60,10 @@ public class ShaderOperator extends ThreadedGridOperator {
      * @param grid Grid with elevation values
      * @param n The vector that will receive the resulting normal. Invalid upon
      * start, only used to avoid creation of a new Vector3D object.
+     * @param cellSize The cell size in meters. Should not be in degrees.
      * <B>Important: row is counted from top to bottom.</B>
      */
-    private void computeTerrainNormal(int col, int row, Grid grid, Vector3D n) {
-
-        // the cell size to calculate the horizontal components of vectors
-        double cSize = grid.getCellSize();
+    private void computeTerrainNormal(int col, int row, Grid grid, Vector3D n, double cellSize) {
         float[][] g = grid.getGrid();
 
         //Make sure the point is inside the grid and not on the border of the grid.       
@@ -83,13 +81,13 @@ public class ShaderOperator extends ThreadedGridOperator {
 
             // sum vector products, one for each quadrant
             // sourth x east
-            Vector3D.vectorProduct(0, -cSize, elevS, cSize, 0, elevE, n);
+            Vector3D.vectorProduct(0, -cellSize, elevS, cellSize, 0, elevE, n);
             // east x north
-            addVectorProduct(cSize, 0, elevE, 0, cSize, elevN, n);
+            addVectorProduct(cellSize, 0, elevE, 0, cellSize, elevN, n);
             // north x west
-            addVectorProduct(0, cSize, elevN, -cSize, 0, elevW, n);
+            addVectorProduct(0, cellSize, elevN, -cellSize, 0, elevW, n);
             // west x south
-            addVectorProduct(-cSize, 0, elevW, 0, -cSize, elevS, n);
+            addVectorProduct(-cellSize, 0, elevW, 0, -cellSize, elevS, n);
 
             // normalize and return vector
             n.normalize();
@@ -119,13 +117,20 @@ public class ShaderOperator extends ThreadedGridOperator {
         // create a normal vector, and re-use it for every pixel
         Vector3D n = new Vector3D(0, 0, 0);
 
+        // the cell size to calculate the horizontal components of vectors
+        double cellSize = src.getCellSize();
+        // convert degrees to meters on a sphere
+        if (cellSize < 0.1) {
+            cellSize = cellSize / 180 * Math.PI * 6371000;
+        }
+        
         // Loop through each grid cell
         float[][] dstGrid = dst.getGrid();
         for (int row = startRow; row < endRow; ++row) {
             float[] dstRow = dstGrid[row];
             for (int col = 0; col < cols; col++) {
                 // compute the normal of the cell
-                computeTerrainNormal(col, row, src, n);
+                computeTerrainNormal(col, row, src, n, cellSize);
 
                 // compute the dot product of the normal and the light vector. This
                 // gives a value between -1 (surface faces directly away from

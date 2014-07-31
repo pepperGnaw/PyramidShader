@@ -63,6 +63,10 @@ public final class Grid implements Cloneable {
         if (cols < 3 || rows < 3) {
             throw new IllegalArgumentException("Not enough data points.");
         }
+        
+        if (cellSize <= 0) {
+            throw new IllegalArgumentException("Negative cell size");
+        }
 
         this.cellSize = cellSize;
         this.grid = new float[rows][cols];

@@ -666,14 +666,6 @@ public class MainWindow extends javax.swing.JFrame {
                     BufferedImage image = model.createDestinationImage(imageScaleFactor);
                     navigableImagePanel.setImage(image);
 
-                    // warning if the grid seems to be in geographic coordinates
-                    if (model.getGrid().getCellSize() < 0.1) {
-                        // hide the progress dialog
-                        completeProgress();
-                        JOptionPane.showMessageDialog(getContentPane(), GEOGRAPHIC_CS_WARNING,
-                                "Pyramid Shader Warning", JOptionPane.WARNING_MESSAGE);
-                    }
-
                     // this will render the image
                     settingsDialog.modelChanged();
                 } catch (ExecutionException e) {
