@@ -33,25 +33,6 @@ public class ShaderOperator extends ThreadedGridOperator {
     }
 
     /**
-     * Compute vector product of v1 and v2, and add resulting vector to destV.
-     * This avoids the creation of a new vector object.
-     *
-     * @param v1x
-     * @param v1y
-     * @param v1z
-     * @param v2x
-     * @param v2y
-     * @param v2z
-     * @param destV destination vector
-     */
-    public static void addVectorProduct(double v1x, double v1y, double v1z,
-            double v2x, double v2y, double v2z, Vector3D destV) {
-        destV.x += v1y * v2z - v1z * v2y;
-        destV.y += v1z * v2x - v1x * v2z;
-        destV.z += v1x * v2y - v1y * v2x;
-    }
-
-    /**
      * Compute a normal vector for a point on a digital elevation model. The
      * length of the normal vector is 1.
      *
@@ -65,37 +46,65 @@ public class ShaderOperator extends ThreadedGridOperator {
      */
     private void computeTerrainNormal(int col, int row, Grid grid, Vector3D n, double cellSize) {
         float[][] g = grid.getGrid();
-
+        
         //Make sure the point is inside the grid and not on the border of the grid.       
         if (col > 0
                 && col < grid.getCols() - 1
                 && row > 0
                 && row < grid.getRows() - 1) {
-
+            
             // get height values
-            double elevCenter = g[row][col];
+            float[] centralRow = g[row];
+            double elevCenter = centralRow[col];
             double elevS = (g[row + 1][col] - elevCenter) * vertExaggeration;
-            double elevE = (g[row][col + 1] - elevCenter) * vertExaggeration;
+            double elevE = (centralRow[col + 1] - elevCenter) * vertExaggeration;
             double elevN = (g[row - 1][col] - elevCenter) * vertExaggeration;
-            double elevW = (g[row][col - 1] - elevCenter) * vertExaggeration;
+            double elevW = (centralRow[col - 1] - elevCenter) * vertExaggeration;
 
             // sum vector products, one for each quadrant
-            // sourth x east
-            Vector3D.vectorProduct(0, -cellSize, elevS, cellSize, 0, elevE, n);
+            // south x east
+            // |0        |   |cellSize|
+            // |-cellSize| x |0       |
+            // |elevS    |   |elevE   |
+            double x = -cellSize * elevE;
+            double y = elevS * cellSize;
+            double z = cellSize * cellSize;
+        
             // east x north
-            addVectorProduct(cellSize, 0, elevE, 0, cellSize, elevN, n);
+            // |cellSize|   |0       |
+            // |0       | x |cellSize|
+            // |elevE   |   |elevN   |
+            x += -elevE * cellSize;
+            y += -cellSize * elevN;
+            z += cellSize * cellSize;
+
             // north x west
-            addVectorProduct(0, cellSize, elevN, -cellSize, 0, elevW, n);
+            // |0       |   |-cellSize|
+            // |cellSize| x |0        |
+            // |elevN   |   |elevW    |
+            x += cellSize * elevW;
+            y += -elevN * cellSize;
+            z += cellSize * cellSize;
+
             // west x south
-            addVectorProduct(-cellSize, 0, elevW, 0, -cellSize, elevS, n);
+            // |-cellSize|   |0        |
+            // |0        | x |-cellSize|
+            // |elevW    |   |elevS    |
+            x += elevW * cellSize;
+            y += cellSize * elevS;
+            z += cellSize * cellSize;
 
             // normalize and return vector
-            n.normalize();
+            double length = Math.sqrt(x * x + y * y + z * z);
+            n.x = x / length;
+            n.y = y / length;
+            n.z = z / length;
+
         } else {
             // border pixels are stuck with a level surface.
             n.x = 0;
             n.y = 0;
-            n.z = 1;
+            n.z = Float.isNaN(g[row][col]) ? Double.NaN : 1;
         }
     }
 
@@ -123,7 +132,7 @@ public class ShaderOperator extends ThreadedGridOperator {
         if (cellSize < 0.1) {
             cellSize = cellSize / 180 * Math.PI * 6371000;
         }
-        
+
         // Loop through each grid cell
         float[][] dstGrid = dst.getGrid();
         for (int row = startRow; row < endRow; ++row) {
