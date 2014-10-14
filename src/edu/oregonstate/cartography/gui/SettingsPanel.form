@@ -661,7 +661,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="contoursIlluminatedLineWidthValueLabel">
+                        <Component class="javax.swing.JLabel" name="contoursIlluminatedLineWidthHighValueLabel">
                           <Properties>
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                               <Connection code="contoursIlluminatedHighestLineWidthSlider.getFont()" type="code"/>
@@ -729,7 +729,7 @@
                             <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="contoursIlluminatedLowestLineWidthSliderStateChanged"/>
                           </Events>
                           <AuxValues>
-                            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="{&#xa;java.util.Hashtable labels = contoursIlluminatedHighestLineWidthSlider.createStandardLabels(10);&#xa;java.util.Enumeration e = labels.elements();&#xa;while(e.hasMoreElements()) {&#xa;    javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();&#xa;    if (comp instanceof javax.swing.JLabel) {&#xa;        javax.swing.JLabel label = (javax.swing.JLabel)(comp);&#xa;        int sliderValue = Integer.parseInt(label.getText());&#xa;        label.setText(Integer.toString(sliderValue / 10));&#xa;    }&#xa;}&#xa;contoursIlluminatedHighestLineWidthSlider.setLabelTable(labels);&#xa;}"/>
+                            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="{&#xa;java.util.Hashtable labels = contoursIlluminatedLowestLineWidthSlider.createStandardLabels(10);&#xa;java.util.Enumeration e = labels.elements();&#xa;while(e.hasMoreElements()) {&#xa;    javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();&#xa;    if (comp instanceof javax.swing.JLabel) {&#xa;        javax.swing.JLabel label = (javax.swing.JLabel)(comp);&#xa;        int sliderValue = Integer.parseInt(label.getText());&#xa;        label.setText(Integer.toString(sliderValue / 10));&#xa;    }&#xa;}&#xa;contoursIlluminatedLowestLineWidthSlider.setLabelTable(labels);&#xa;}"/>
                           </AuxValues>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -737,7 +737,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="contoursIlluminatedLineWidthValueLabel1">
+                        <Component class="javax.swing.JLabel" name="contoursIlluminatedLineWidthLowValueLabel">
                           <Properties>
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                               <Connection code="contoursIlluminatedHighestLineWidthSlider.getFont()" type="code"/>
@@ -803,7 +803,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="contoursShadowedLineWidthValueLabel">
+                        <Component class="javax.swing.JLabel" name="contoursShadowedLineWidthHighValueLabel">
                           <Properties>
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                               <Connection code="contoursShadowHighestLineWidthSlider.getFont()" type="code"/>
@@ -819,7 +819,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Component class="javax.swing.JToggleButton" name="contoursIlluminatedLockedToggleButton1">
+                        <Component class="javax.swing.JToggleButton" name="contoursShadowedLockedToggleButton">
                           <Properties>
                             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                               <Image iconType="3" name="/edu/oregonstate/cartography/gui/icons/unlocked14.png"/>
@@ -835,7 +835,7 @@
                             </Property>
                           </Properties>
                           <Events>
-                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="contoursIlluminatedLockedToggleButton1ActionPerformed"/>
+                            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="contoursShadowedLockedToggleButtonActionPerformed"/>
                           </Events>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -871,7 +871,7 @@
                             <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="contoursShadowLowestLineWidthSliderStateChanged"/>
                           </Events>
                           <AuxValues>
-                            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="{&#xa;java.util.Hashtable labels = contoursShadowHighestLineWidthSlider.createStandardLabels(10);&#xa;java.util.Enumeration e = labels.elements();&#xa;while(e.hasMoreElements()) {&#xa;    javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();&#xa;    if (comp instanceof javax.swing.JLabel) {&#xa;        javax.swing.JLabel label = (javax.swing.JLabel)(comp);&#xa;        int sliderValue = Integer.parseInt(label.getText());&#xa;        label.setText(Integer.toString(sliderValue / 10));&#xa;    }&#xa;}&#xa;contoursShadowHighestLineWidthSlider.setLabelTable(labels);&#xa;}"/>
+                            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="{&#xa;java.util.Hashtable labels = contoursShadowLowestLineWidthSlider.createStandardLabels(10);&#xa;java.util.Enumeration e = labels.elements();&#xa;while(e.hasMoreElements()) {&#xa;    javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();&#xa;    if (comp instanceof javax.swing.JLabel) {&#xa;        javax.swing.JLabel label = (javax.swing.JLabel)(comp);&#xa;        int sliderValue = Integer.parseInt(label.getText());&#xa;        label.setText(Integer.toString(sliderValue / 10));&#xa;    }&#xa;}&#xa;contoursShadowLowestLineWidthSlider.setLabelTable(labels);&#xa;}"/>
                           </AuxValues>
                           <Constraints>
                             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -879,7 +879,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="contoursShadowedLineWidthValueLabel1">
+                        <Component class="javax.swing.JLabel" name="contoursShadowLineWidthLowValueLabel">
                           <Properties>
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                               <Connection code="contoursShadowHighestLineWidthSlider.getFont()" type="code"/>

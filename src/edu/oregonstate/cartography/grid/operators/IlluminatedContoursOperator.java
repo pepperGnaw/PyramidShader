@@ -25,12 +25,18 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
     // illuminated and shaded or only shaded contours
     private final boolean illuminated;
 
-    // width of shaded lines
-    private final double shadowWidth;
+    // width of lowest shaded lines
+    private final double shadowWidthLow;
 
-    // width of illuminated lines
-    private final double illuminatedWidth;
+    // width of highestshaded lines
+    private final double shadowWidthHigh;
+    
+    // width of lowest illuminated lines
+    private final double illuminatedWidthLow;
 
+    // width of highest illuminated lines
+    private final double illuminatedWidthHigh;
+    
     // minimum line width
     private final double minWidth;
 
@@ -62,13 +68,21 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
 
     // pixel buffer to render to
     private int[] imageBuffer;
+    
+    // lowest elevation in grid
+    private final float gridMin;
+    
+    // highest elevation in grid
+    private final float gridMax;
 
     /**
      *
      * @param illuminated
-     * @param shadowWidth
-     * @param illuminatedWidth
+     * @param shadowWidthLow
+     * @param shadowWidthHigh
+     * @param illuminatedWidthLow
      * @param minWidth
+     * @param illuminatedWidthHigh
      * @param tanaka
      * @param azimuth
      * @param interval
@@ -76,10 +90,13 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
      * @param illluminatedGray
      * @param aspectGaussBlur
      * @param transitionAngle
+     * @param gridMinMax
      */
     public IlluminatedContoursOperator(boolean illuminated,
-            double shadowWidth,
-            double illuminatedWidth,
+            double shadowWidthLow,
+            double shadowWidthHigh,
+            double illuminatedWidthLow,
+            double illuminatedWidthHigh,
             double minWidth,
             boolean tanaka,
             double azimuth,
@@ -87,10 +104,13 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
             int gradientAngle,
             int illluminatedGray,
             double aspectGaussBlur,
-            int transitionAngle) {
+            int transitionAngle,
+            float[] gridMinMax) {
         this.illuminated = illuminated;
-        this.shadowWidth = shadowWidth;
-        this.illuminatedWidth = illuminatedWidth;
+        this.shadowWidthLow = shadowWidthLow;
+        this.shadowWidthHigh = shadowWidthHigh;
+        this.illuminatedWidthLow = illuminatedWidthLow;
+        this.illuminatedWidthHigh = illuminatedWidthHigh;
         this.minWidth = minWidth;
         this.tanaka = tanaka;
         this.azimuth = azimuth;
@@ -99,6 +119,8 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         this.illluminatedGray = illluminatedGray;
         this.aspectGaussBlur = aspectGaussBlur;
         this.transitionAngle = transitionAngle;
+        this.gridMin = gridMinMax[0];
+        this.gridMax = gridMinMax[1];
     }
 
     /**
@@ -259,11 +281,16 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         // calculate minumum angle between illumination angle and aspect
         double angleDiff = smallestAngleDiff(illumination, aspect);
         // set 'a' based on the angle distance from the angle of illumination.
+        double w = (gridMax - elevation) / (gridMax - gridMin);
+        //double gamma = 2;
+        //w = Math.pow(w, 1d / gamma);
+        double shadowWidth = shadowWidthLow * w  + shadowWidthHigh * (1d - w);
+        double illiminatedWidth = illuminatedWidthLow * w  + illuminatedWidthHigh * (1d - w);
         double a;
         if (angleDiff > transitionAngle) {
             a = shadowWidth * slope * cellSize;
         } else {
-            a = illuminatedWidth * slope * cellSize;
+            a = illiminatedWidth * slope * cellSize;
         }
         if (tanaka) {
             a *= Math.abs(Math.cos(angleDiff / 180 * Math.PI));

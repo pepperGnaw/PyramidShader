@@ -137,14 +137,27 @@ public class Model implements Cloneable {
     public double contoursInterval = 200;
 
     /**
-     * line width of illuminated contours (relative to cell size)
+     * line width of illuminated contours (relative to cell size) at lowest
+     * elevation
      */
-    public double contoursIlluminatedWidth = 0.5;
+    public double contoursIlluminatedWidthLow = 0.5;
 
     /**
-     * line width of shaded contours (relative to cell size)
+     * line width of illuminated contours (relative to cell size) at highest
+     * elevation
      */
-    public double contoursShadowWidth = 0.5;
+    public double contoursIlluminatedWidthHigh = 0.5;
+
+    /**
+     * line width of shaded contours (relative to cell size) at lowest elevation
+     */
+    public double contoursShadowWidthLow = 0.5;
+
+    /**
+     * line width of shaded contours (relative to cell size) at highest
+     * elevation
+     */
+    public double contoursShadowWidthHigh = 0.5;
 
     /**
      * contour line widths are never smaller than this value (relative to cell
@@ -460,8 +473,10 @@ public class Model implements Cloneable {
             boolean illuminated) {
         return new IlluminatedContoursOperator(
                 illuminated,
-                contoursShadowWidth,
-                contoursIlluminatedWidth,
+                contoursShadowWidthLow,
+                contoursShadowWidthHigh,
+                contoursIlluminatedWidthLow,
+                contoursIlluminatedWidthHigh,
                 contoursMinWidth,
                 contoursTanaka,
                 azimuth,
@@ -469,7 +484,8 @@ public class Model implements Cloneable {
                 contoursGradientAngle,
                 contoursIllluminatedGray,
                 contoursAspectGaussBlur,
-                contoursTransitionAngle);
+                contoursTransitionAngle,
+                gridMinMax);
     }
 
     /**
