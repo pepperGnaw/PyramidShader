@@ -220,11 +220,21 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursEmptyPanel = new TransparentMacPanel();
         contoursSettingsPanel = new TransparentMacPanel();
         javax.swing.JLabel contoursIlluminatedLineWidthLabel = new javax.swing.JLabel();
-        contoursIlluminatedLineWidthSlider = new javax.swing.JSlider();
+        javax.swing.JLabel contoursIlluminatedHighestLabel = new javax.swing.JLabel();
+        contoursIlluminatedHighestLineWidthSlider = new javax.swing.JSlider();
         contoursIlluminatedLineWidthValueLabel = new javax.swing.JLabel();
+        contoursIlluminatedLockedToggleButton = new javax.swing.JToggleButton();
+        javax.swing.JLabel contoursIlluminatedLowestLabel = new javax.swing.JLabel();
+        contoursIlluminatedLowestLineWidthSlider = new javax.swing.JSlider();
+        contoursIlluminatedLineWidthValueLabel1 = new javax.swing.JLabel();
         javax.swing.JLabel contoursShadwoLineWidthSlider = new javax.swing.JLabel();
-        contoursShadowLineWidthSlider = new javax.swing.JSlider();
+        javax.swing.JLabel contoursShadowedHighest = new javax.swing.JLabel();
+        contoursShadowHighestLineWidthSlider = new javax.swing.JSlider();
         contoursShadowedLineWidthValueLabel = new javax.swing.JLabel();
+        contoursIlluminatedLockedToggleButton1 = new javax.swing.JToggleButton();
+        javax.swing.JLabel contoursShadowedLowest = new javax.swing.JLabel();
+        contoursShadowLowestLineWidthSlider = new javax.swing.JSlider();
+        contoursShadowedLineWidthValueLabel1 = new javax.swing.JLabel();
         javax.swing.JLabel contoursMinLineWidthLabel = new javax.swing.JLabel();
         contoursMinLineWidthSlider = new javax.swing.JSlider();
         contoursMinLineWidthValueLabel = new javax.swing.JLabel();
@@ -637,19 +647,27 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursIlluminatedLineWidthLabel.setText("Illuminated Line Width");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         contoursSettingsPanel.add(contoursIlluminatedLineWidthLabel, gridBagConstraints);
 
-        contoursIlluminatedLineWidthSlider.setMajorTickSpacing(10);
-        contoursIlluminatedLineWidthSlider.setMaximum(50);
-        contoursIlluminatedLineWidthSlider.setMinorTickSpacing(5);
-        contoursIlluminatedLineWidthSlider.setPaintLabels(true);
-        contoursIlluminatedLineWidthSlider.setPaintTicks(true);
-        contoursIlluminatedLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
-        contoursIlluminatedLineWidthSlider.setValue(0);
+        contoursIlluminatedHighestLabel.setText("Highest");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursIlluminatedHighestLabel, gridBagConstraints);
+
+        contoursIlluminatedHighestLineWidthSlider.setMajorTickSpacing(10);
+        contoursIlluminatedHighestLineWidthSlider.setMaximum(50);
+        contoursIlluminatedHighestLineWidthSlider.setMinorTickSpacing(5);
+        contoursIlluminatedHighestLineWidthSlider.setPaintLabels(true);
+        contoursIlluminatedHighestLineWidthSlider.setPaintTicks(true);
+        contoursIlluminatedHighestLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
+        contoursIlluminatedHighestLineWidthSlider.setValue(0);
         {
-            java.util.Hashtable labels = contoursIlluminatedLineWidthSlider.createStandardLabels(10);
+            java.util.Hashtable labels = contoursIlluminatedHighestLineWidthSlider.createStandardLabels(10);
             java.util.Enumeration e = labels.elements();
             while(e.hasMoreElements()) {
                 javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
@@ -659,27 +677,92 @@ public class SettingsPanel extends javax.swing.JPanel {
                     label.setText(Integer.toString(sliderValue / 10));
                 }
             }
-            contoursIlluminatedLineWidthSlider.setLabelTable(labels);
+            contoursIlluminatedHighestLineWidthSlider.setLabelTable(labels);
         }
-        contoursIlluminatedLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+        contoursIlluminatedHighestLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                contoursIlluminatedLineWidthSliderStateChanged(evt);
+                contoursIlluminatedHighestLineWidthSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        contoursSettingsPanel.add(contoursIlluminatedHighestLineWidthSlider, gridBagConstraints);
+
+        contoursIlluminatedLineWidthValueLabel.setFont(contoursIlluminatedHighestLineWidthSlider.getFont());
+        contoursIlluminatedLineWidthValueLabel.setText("4.5");
+        contoursIlluminatedLineWidthValueLabel.setPreferredSize(new java.awt.Dimension(30, 16));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
+        contoursSettingsPanel.add(contoursIlluminatedLineWidthValueLabel, gridBagConstraints);
+
+        contoursIlluminatedLockedToggleButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/oregonstate/cartography/gui/icons/unlocked14.png"))); // NOI18N
+        contoursIlluminatedLockedToggleButton.setSelected(true);
+        contoursIlluminatedLockedToggleButton.setBorderPainted(false);
+        contoursIlluminatedLockedToggleButton.setContentAreaFilled(false);
+        contoursIlluminatedLockedToggleButton.setPreferredSize(new java.awt.Dimension(14, 14));
+        contoursIlluminatedLockedToggleButton.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/oregonstate/cartography/gui/icons/locked14.png"))); // NOI18N
+        contoursIlluminatedLockedToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contoursIlluminatedLockedToggleButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        contoursSettingsPanel.add(contoursIlluminatedLockedToggleButton, gridBagConstraints);
+
+        contoursIlluminatedLowestLabel.setText("Lowest");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursIlluminatedLowestLabel, gridBagConstraints);
+
+        contoursIlluminatedLowestLineWidthSlider.setMajorTickSpacing(10);
+        contoursIlluminatedLowestLineWidthSlider.setMaximum(50);
+        contoursIlluminatedLowestLineWidthSlider.setMinorTickSpacing(5);
+        contoursIlluminatedLowestLineWidthSlider.setPaintLabels(true);
+        contoursIlluminatedLowestLineWidthSlider.setPaintTicks(true);
+        contoursIlluminatedLowestLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
+        contoursIlluminatedLowestLineWidthSlider.setValue(0);
+        {
+            java.util.Hashtable labels = contoursIlluminatedHighestLineWidthSlider.createStandardLabels(10);
+            java.util.Enumeration e = labels.elements();
+            while(e.hasMoreElements()) {
+                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
+                if (comp instanceof javax.swing.JLabel) {
+                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
+                    int sliderValue = Integer.parseInt(label.getText());
+                    label.setText(Integer.toString(sliderValue / 10));
+                }
+            }
+            contoursIlluminatedHighestLineWidthSlider.setLabelTable(labels);
+        }
+        contoursIlluminatedLowestLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                contoursIlluminatedLowestLineWidthSliderStateChanged(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        contoursSettingsPanel.add(contoursIlluminatedLineWidthSlider, gridBagConstraints);
+        contoursSettingsPanel.add(contoursIlluminatedLowestLineWidthSlider, gridBagConstraints);
 
-        contoursIlluminatedLineWidthValueLabel.setFont(contoursIlluminatedLineWidthSlider.getFont());
-        contoursIlluminatedLineWidthValueLabel.setText("4.5");
-        contoursIlluminatedLineWidthValueLabel.setPreferredSize(new java.awt.Dimension(30, 16));
+        contoursIlluminatedLineWidthValueLabel1.setFont(contoursIlluminatedHighestLineWidthSlider.getFont());
+        contoursIlluminatedLineWidthValueLabel1.setText("4.5");
+        contoursIlluminatedLineWidthValueLabel1.setPreferredSize(new java.awt.Dimension(30, 16));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
-        contoursSettingsPanel.add(contoursIlluminatedLineWidthValueLabel, gridBagConstraints);
+        contoursSettingsPanel.add(contoursIlluminatedLineWidthValueLabel1, gridBagConstraints);
 
         contoursShadwoLineWidthSlider.setText("Shadowed Line Width");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -688,15 +771,22 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursShadwoLineWidthSlider, gridBagConstraints);
 
-        contoursShadowLineWidthSlider.setMajorTickSpacing(10);
-        contoursShadowLineWidthSlider.setMaximum(50);
-        contoursShadowLineWidthSlider.setMinorTickSpacing(5);
-        contoursShadowLineWidthSlider.setPaintLabels(true);
-        contoursShadowLineWidthSlider.setPaintTicks(true);
-        contoursShadowLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
-        contoursShadowLineWidthSlider.setValue(0);
+        contoursShadowedHighest.setText("Highest");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursShadowedHighest, gridBagConstraints);
+
+        contoursShadowHighestLineWidthSlider.setMajorTickSpacing(10);
+        contoursShadowHighestLineWidthSlider.setMaximum(50);
+        contoursShadowHighestLineWidthSlider.setMinorTickSpacing(5);
+        contoursShadowHighestLineWidthSlider.setPaintLabels(true);
+        contoursShadowHighestLineWidthSlider.setPaintTicks(true);
+        contoursShadowHighestLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
+        contoursShadowHighestLineWidthSlider.setValue(0);
         {
-            java.util.Hashtable labels = contoursShadowLineWidthSlider.createStandardLabels(10);
+            java.util.Hashtable labels = contoursShadowHighestLineWidthSlider.createStandardLabels(10);
             java.util.Enumeration e = labels.elements();
             while(e.hasMoreElements()) {
                 javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
@@ -706,32 +796,97 @@ public class SettingsPanel extends javax.swing.JPanel {
                     label.setText(Integer.toString(sliderValue / 10));
                 }
             }
-            contoursShadowLineWidthSlider.setLabelTable(labels);
+            contoursShadowHighestLineWidthSlider.setLabelTable(labels);
         }
-        contoursShadowLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+        contoursShadowHighestLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                contoursShadowLineWidthSliderStateChanged(evt);
+                contoursShadowHighestLineWidthSliderStateChanged(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        contoursSettingsPanel.add(contoursShadowLineWidthSlider, gridBagConstraints);
+        contoursSettingsPanel.add(contoursShadowHighestLineWidthSlider, gridBagConstraints);
 
-        contoursShadowedLineWidthValueLabel.setFont(contoursShadowLineWidthSlider.getFont());
+        contoursShadowedLineWidthValueLabel.setFont(contoursShadowHighestLineWidthSlider.getFont());
         contoursShadowedLineWidthValueLabel.setText("123");
         contoursShadowedLineWidthValueLabel.setPreferredSize(new java.awt.Dimension(30, 16));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
         contoursSettingsPanel.add(contoursShadowedLineWidthValueLabel, gridBagConstraints);
+
+        contoursIlluminatedLockedToggleButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/oregonstate/cartography/gui/icons/unlocked14.png"))); // NOI18N
+        contoursIlluminatedLockedToggleButton1.setSelected(true);
+        contoursIlluminatedLockedToggleButton1.setBorderPainted(false);
+        contoursIlluminatedLockedToggleButton1.setContentAreaFilled(false);
+        contoursIlluminatedLockedToggleButton1.setPreferredSize(new java.awt.Dimension(16, 16));
+        contoursIlluminatedLockedToggleButton1.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/oregonstate/cartography/gui/icons/locked14.png"))); // NOI18N
+        contoursIlluminatedLockedToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contoursIlluminatedLockedToggleButton1ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        contoursSettingsPanel.add(contoursIlluminatedLockedToggleButton1, gridBagConstraints);
+
+        contoursShadowedLowest.setText("Lowest");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        contoursSettingsPanel.add(contoursShadowedLowest, gridBagConstraints);
+
+        contoursShadowLowestLineWidthSlider.setMajorTickSpacing(10);
+        contoursShadowLowestLineWidthSlider.setMaximum(50);
+        contoursShadowLowestLineWidthSlider.setMinorTickSpacing(5);
+        contoursShadowLowestLineWidthSlider.setPaintLabels(true);
+        contoursShadowLowestLineWidthSlider.setPaintTicks(true);
+        contoursShadowLowestLineWidthSlider.setToolTipText("Line widths are relative to grid cell size.");
+        contoursShadowLowestLineWidthSlider.setValue(0);
+        {
+            java.util.Hashtable labels = contoursShadowHighestLineWidthSlider.createStandardLabels(10);
+            java.util.Enumeration e = labels.elements();
+            while(e.hasMoreElements()) {
+                javax.swing.JComponent comp = (javax.swing.JComponent)e.nextElement();
+                if (comp instanceof javax.swing.JLabel) {
+                    javax.swing.JLabel label = (javax.swing.JLabel)(comp);
+                    int sliderValue = Integer.parseInt(label.getText());
+                    label.setText(Integer.toString(sliderValue / 10));
+                }
+            }
+            contoursShadowHighestLineWidthSlider.setLabelTable(labels);
+        }
+        contoursShadowLowestLineWidthSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                contoursShadowLowestLineWidthSliderStateChanged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        contoursSettingsPanel.add(contoursShadowLowestLineWidthSlider, gridBagConstraints);
+
+        contoursShadowedLineWidthValueLabel1.setFont(contoursShadowHighestLineWidthSlider.getFont());
+        contoursShadowedLineWidthValueLabel1.setText("123");
+        contoursShadowedLineWidthValueLabel1.setPreferredSize(new java.awt.Dimension(30, 16));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
+        contoursSettingsPanel.add(contoursShadowedLineWidthValueLabel1, gridBagConstraints);
 
         contoursMinLineWidthLabel.setText("Minimum Line Width");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursMinLineWidthLabel, gridBagConstraints);
 
@@ -762,7 +917,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         contoursSettingsPanel.add(contoursMinLineWidthSlider, gridBagConstraints);
 
@@ -771,7 +926,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursMinLineWidthValueLabel.setPreferredSize(new java.awt.Dimension(30, 16));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
         contoursSettingsPanel.add(contoursMinLineWidthValueLabel, gridBagConstraints);
 
@@ -779,7 +934,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursWidthInfoLabel.setText("Line widths are relative to grid cell size.");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
@@ -788,7 +943,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursIntervalLabel.setText("Interval");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursIntervalLabel, gridBagConstraints);
 
@@ -802,14 +957,14 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         contoursSettingsPanel.add(contoursIntervalTextBox, gridBagConstraints);
 
         contoursGradientLabel.setText("Gradient Angle");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursGradientLabel, gridBagConstraints);
 
@@ -839,13 +994,13 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 14;
         contoursSettingsPanel.add(contoursGradientSlider, gridBagConstraints);
 
         contoursDespeckleLabel.setText("Despeckle");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursDespeckleLabel, gridBagConstraints);
 
@@ -860,14 +1015,14 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         contoursSettingsPanel.add(contoursDespeckleSlider, gridBagConstraints);
 
         contoursTransitionLabel.setText("Transition");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 16;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         contoursSettingsPanel.add(contoursTransitionLabel, gridBagConstraints);
 
@@ -896,7 +1051,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 16;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         contoursSettingsPanel.add(contoursTransitionSlider, gridBagConstraints);
 
@@ -904,7 +1059,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursExportInfoLabel.setText("Use File > Save Contour Image for high resolution contour image.");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 18;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
@@ -918,7 +1073,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 17;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         contoursSettingsPanel.add(contoursBlankBackgroundButton, gridBagConstraints);
@@ -946,8 +1101,8 @@ public class SettingsPanel extends javax.swing.JPanel {
         azimuthSlider.setValue(m.azimuth);
         zenithSlider.setValue(m.zenith);
 
-        contoursIlluminatedLineWidthSlider.setValue((int) Math.round(m.contoursIlluminatedWidth * 10));
-        contoursShadowLineWidthSlider.setValue((int) Math.round(m.contoursShadowWidth * 10));
+        contoursIlluminatedHighestLineWidthSlider.setValue((int) Math.round(m.contoursIlluminatedWidth * 10));
+        contoursShadowHighestLineWidthSlider.setValue((int) Math.round(m.contoursShadowWidth * 10));
         contoursMinLineWidthSlider.setValue((int) Math.round(m.contoursMinWidth * 10));
         contoursGradientSlider.setValue(m.contoursGradientAngle);
         contoursIntervalTextBox.setValue(m.contoursInterval);
@@ -1084,42 +1239,42 @@ public class SettingsPanel extends javax.swing.JPanel {
      * @return
      */
     private boolean isContoursLineWidthSliderAdjusting() {
-        return contoursIlluminatedLineWidthSlider.getValueIsAdjusting()
-                | contoursShadowLineWidthSlider.getValueIsAdjusting()
+        return contoursIlluminatedHighestLineWidthSlider.getValueIsAdjusting()
+                | contoursShadowHighestLineWidthSlider.getValueIsAdjusting()
                 | contoursMinLineWidthSlider.getValueIsAdjusting();
     }
-    private void contoursIlluminatedLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursIlluminatedLineWidthSliderStateChanged
-        model.contoursIlluminatedWidth = contoursIlluminatedLineWidthSlider.getValue() / 10.f;
-        adjustContoursMinLineWidthSlider(contoursIlluminatedLineWidthSlider);
+    private void contoursIlluminatedHighestLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursIlluminatedHighestLineWidthSliderStateChanged
+        model.contoursIlluminatedWidth = contoursIlluminatedHighestLineWidthSlider.getValue() / 10.f;
+        adjustContoursMinLineWidthSlider(contoursIlluminatedHighestLineWidthSlider);
         updateImage(isContoursLineWidthSliderAdjusting() ? FAST : REGULAR);
         String t = new DecimalFormat("0.0").format(model.contoursIlluminatedWidth);
         contoursIlluminatedLineWidthValueLabel.setText(t);
-    }//GEN-LAST:event_contoursIlluminatedLineWidthSliderStateChanged
+    }//GEN-LAST:event_contoursIlluminatedHighestLineWidthSliderStateChanged
 
-    private void contoursShadowLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursShadowLineWidthSliderStateChanged
-        model.contoursShadowWidth = contoursShadowLineWidthSlider.getValue() / 10.f;
-        adjustContoursMinLineWidthSlider(contoursShadowLineWidthSlider);
+    private void contoursShadowHighestLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursShadowHighestLineWidthSliderStateChanged
+        model.contoursShadowWidth = contoursShadowHighestLineWidthSlider.getValue() / 10.f;
+        adjustContoursMinLineWidthSlider(contoursShadowHighestLineWidthSlider);
         updateImage(isContoursLineWidthSliderAdjusting() ? FAST : REGULAR);
         String t = new DecimalFormat("0.0").format(model.contoursShadowWidth);
         contoursShadowedLineWidthValueLabel.setText(t);
-    }//GEN-LAST:event_contoursShadowLineWidthSliderStateChanged
+    }//GEN-LAST:event_contoursShadowHighestLineWidthSliderStateChanged
 
     private void contoursMinLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursMinLineWidthSliderStateChanged
         model.contoursMinWidth = contoursMinLineWidthSlider.getValue() / 10.;
 
         // remove event listener to avoid triggering a rendering event
-        ChangeListener listener = contoursIlluminatedLineWidthSlider.getChangeListeners()[0];
-        contoursIlluminatedLineWidthSlider.removeChangeListener(listener);
-        int illuminatedWidth = Math.max(contoursIlluminatedLineWidthSlider.getValue(), contoursMinLineWidthSlider.getValue());
-        contoursIlluminatedLineWidthSlider.setValue(illuminatedWidth);
-        contoursIlluminatedLineWidthSlider.addChangeListener(listener);
+        ChangeListener listener = contoursIlluminatedHighestLineWidthSlider.getChangeListeners()[0];
+        contoursIlluminatedHighestLineWidthSlider.removeChangeListener(listener);
+        int illuminatedWidth = Math.max(contoursIlluminatedHighestLineWidthSlider.getValue(), contoursMinLineWidthSlider.getValue());
+        contoursIlluminatedHighestLineWidthSlider.setValue(illuminatedWidth);
+        contoursIlluminatedHighestLineWidthSlider.addChangeListener(listener);
 
         // remove event listener to avoid triggering a rendering event
-        listener = contoursShadowLineWidthSlider.getChangeListeners()[0];
-        contoursShadowLineWidthSlider.removeChangeListener(listener);
-        int shadowdWidth = Math.max(contoursShadowLineWidthSlider.getValue(), contoursMinLineWidthSlider.getValue());
-        contoursShadowLineWidthSlider.setValue(shadowdWidth);
-        contoursShadowLineWidthSlider.addChangeListener(listener);
+        listener = contoursShadowHighestLineWidthSlider.getChangeListeners()[0];
+        contoursShadowHighestLineWidthSlider.removeChangeListener(listener);
+        int shadowdWidth = Math.max(contoursShadowHighestLineWidthSlider.getValue(), contoursMinLineWidthSlider.getValue());
+        contoursShadowHighestLineWidthSlider.setValue(shadowdWidth);
+        contoursShadowHighestLineWidthSlider.addChangeListener(listener);
 
         // update model
         model.contoursIlluminatedWidth = illuminatedWidth / 10d;
@@ -1207,6 +1362,22 @@ public class SettingsPanel extends javax.swing.JPanel {
         updateImage(REGULAR);
     }//GEN-LAST:event_contoursBlankBackgroundButtonActionPerformed
 
+    private void contoursIlluminatedLowestLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursIlluminatedLowestLineWidthSliderStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_contoursIlluminatedLowestLineWidthSliderStateChanged
+
+    private void contoursIlluminatedLockedToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contoursIlluminatedLockedToggleButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_contoursIlluminatedLockedToggleButtonActionPerformed
+
+    private void contoursIlluminatedLockedToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contoursIlluminatedLockedToggleButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_contoursIlluminatedLockedToggleButton1ActionPerformed
+
+    private void contoursShadowLowestLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursShadowLowestLineWidthSliderStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_contoursShadowLowestLineWidthSliderStateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JSlider azimuthSlider;
     private javax.swing.JPanel colorGradientPanel;
@@ -1219,15 +1390,21 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JSlider contoursDespeckleSlider;
     private javax.swing.JPanel contoursEmptyPanel;
     private javax.swing.JSlider contoursGradientSlider;
-    private javax.swing.JSlider contoursIlluminatedLineWidthSlider;
+    private javax.swing.JSlider contoursIlluminatedHighestLineWidthSlider;
     private javax.swing.JLabel contoursIlluminatedLineWidthValueLabel;
+    private javax.swing.JLabel contoursIlluminatedLineWidthValueLabel1;
+    private javax.swing.JToggleButton contoursIlluminatedLockedToggleButton;
+    private javax.swing.JToggleButton contoursIlluminatedLockedToggleButton1;
+    private javax.swing.JSlider contoursIlluminatedLowestLineWidthSlider;
     private javax.swing.JFormattedTextField contoursIntervalTextBox;
     private javax.swing.JSlider contoursMinLineWidthSlider;
     private javax.swing.JLabel contoursMinLineWidthValueLabel;
     private javax.swing.JPanel contoursPanel;
     private javax.swing.JPanel contoursSettingsPanel;
-    private javax.swing.JSlider contoursShadowLineWidthSlider;
+    private javax.swing.JSlider contoursShadowHighestLineWidthSlider;
+    private javax.swing.JSlider contoursShadowLowestLineWidthSlider;
     private javax.swing.JLabel contoursShadowedLineWidthValueLabel;
+    private javax.swing.JLabel contoursShadowedLineWidthValueLabel1;
     private javax.swing.JSlider contoursTransitionSlider;
     private javax.swing.JLabel generalizationDetaiIndicator;
     private javax.swing.JSlider generalizationDetailSlider;

@@ -10,9 +10,11 @@ import edu.oregonstate.cartography.grid.Grid;
  */
 public class ShaderOperator extends ThreadedGridOperator {
 
-    // vertical exaggeration factor applied to terrain values before computing a 
-    // shading value
-    private double vertExaggeration;
+    /**
+     * Vertical exaggeration factor applied to terrain values before computing 
+     * a shading value.
+     */
+    private double vertExaggeration = 1;
 
     /**
      * Azimuth of the light. Counted from north in counter-clock-wise direction.
@@ -47,7 +49,8 @@ public class ShaderOperator extends ThreadedGridOperator {
     private void computeTerrainNormal(int col, int row, Grid grid, Vector3D n, double cellSize) {
         float[][] g = grid.getGrid();
         
-        //Make sure the point is inside the grid and not on the border of the grid.       
+        //Make sure the point is inside the grid and not on the border of the grid.
+        // FIXME compute shading along border
         if (col > 0
                 && col < grid.getCols() - 1
                 && row > 0
@@ -158,19 +161,26 @@ public class ShaderOperator extends ThreadedGridOperator {
     }
 
     /**
-     * @param illuminationAzimuth the illuminationAzimuth to set
+     * @param illuminationAzimuth Counted from north in counter-clock-wise direction.
+     * Between 0 and 360 degrees.
      */
     public void setIlluminationAzimuth(int illuminationAzimuth) {
         this.illuminationAzimuth = illuminationAzimuth;
     }
 
     /**
-     * @param illuminationZenith the illuminationZenith to set
+     * @param illuminationZenith The vertical angle of the light direction from the zenith towards the
+     * horizon. Between 0 and 90 degrees.
      */
     public void setIlluminationZenith(int illuminationZenith) {
         this.illuminationZenith = illuminationZenith;
     }
 
+    /**
+     * 
+     * @param ve Vertical exaggeration factor applied to terrain values before computing 
+     * a shading value.
+     */
     public void setVerticalExaggeration(double ve) {
         this.vertExaggeration = ve;
     }
