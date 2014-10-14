@@ -103,6 +103,9 @@
                       icon="mac/icon.icns">
             <classpath file="${dist.jar}" />
         </macbundleapp>
+        <zip destfile="mac/PyramidShader.zip" level="9">
+            <zipfileset filemode="755" dir="mac/Pyramid Shader.app" prefix="Pyramid Shader.app" />
+        </zip>
     </target>
     
     <target name="-post-jar">
@@ -123,6 +126,7 @@
     <target name="-post-clean">
         <delete file="win/PyramidShader.exe"/>
         <delete dir="mac/Pyramid Shader.app"/>
+        <delete file="mac/PyramidShader.zip"/>
     </target>
     
 </project>
