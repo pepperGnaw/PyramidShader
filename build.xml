@@ -84,10 +84,25 @@
         maximum of 1200 mb ram. Using launch4j. -->
         <property name="launch4j.dir" location="win/launch4j" />
         <taskdef name="launch4j"
-                         classname="net.sf.launch4j.ant.Launch4jTask"
-                         classpath="${launch4j.dir}/launch4j.jar
+                 classname="net.sf.launch4j.ant.Launch4jTask"
+                 classpath="${launch4j.dir}/launch4j.jar
         :${launch4j.dir}/lib/xstream.jar" />
         <launch4j configFile="win/PyramidShader_32bit.xml" />
+    </target>
+    
+    <taskdef name="macbundleapp"
+             classname="com.oracle.appbundler.AppBundlerTask"   
+             classpath="mac/appbundler-1.0.jar" />
+
+    <target name="run.macappbundler">
+        <macbundleapp outputdirectory="mac/"
+                      name="Pyramid Shader"
+                      displayname="Pyramid Shader"
+                      identifier="${main.class}"
+                      mainclassname="${main.class}"
+                      icon="mac/icon.icns">
+            <classpath file="${dist.jar}" />
+        </macbundleapp>
     </target>
     
     <target name="-post-jar">
@@ -100,12 +115,14 @@
             </manifest>
         </jar>
         
+        
         <antcall target="run.launch4j"/>
+        <antcall target="run.macappbundler"/>
     </target>
     
     <target name="-post-clean">
         <delete file="win/PyramidShader.exe"/>
-        <!-- <delete file="./mac/Scree Painter.app/Contents/Resources/Java/ScreePainter.jar"/> -->
+        <delete dir="mac/Pyramid Shader.app"/>
     </target>
     
 </project>
