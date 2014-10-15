@@ -803,7 +803,7 @@
                             </Constraint>
                           </Constraints>
                         </Component>
-                        <Component class="javax.swing.JLabel" name="contoursShadowedLineWidthHighValueLabel">
+                        <Component class="javax.swing.JLabel" name="contoursShadowLineWidthHighValueLabel">
                           <Properties>
                             <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                               <Connection code="contoursShadowHighestLineWidthSlider.getFont()" type="code"/>
