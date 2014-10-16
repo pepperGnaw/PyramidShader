@@ -100,7 +100,10 @@
                       displayname="Pyramid Shader"
                       identifier="${main.class}"
                       mainclassname="${main.class}"
-                      icon="mac/icon.icns">
+                      icon="mac/icon.icns"
+                      shortversion="0.1.0"
+                      copyright="© Oregon State University"
+                      applicationCategory="public.app-category.graphics-design">
             <classpath file="${dist.jar}" />
         </macbundleapp>
         <zip destfile="mac/PyramidShader.zip" level="9">
