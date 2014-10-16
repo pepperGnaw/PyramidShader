@@ -90,7 +90,7 @@ public class MainWindow extends javax.swing.JFrame {
         javax.swing.JMenu saveContoursMenu = new javax.swing.JMenu();
         saveTIFFContoursMenuItem = new javax.swing.JMenuItem();
         savePNGContoursMenuItem = new javax.swing.JMenuItem();
-        jMenu1 = new javax.swing.JMenu();
+        editMenu = new javax.swing.JMenu();
         scaleTerrainModelMenuItem = new javax.swing.JMenuItem();
         offsetTerrainModelMenuItem = new javax.swing.JMenuItem();
         viewMenu = new javax.swing.JMenu();
@@ -110,7 +110,7 @@ public class MainWindow extends javax.swing.JFrame {
         jLabel1.setText("Image resolution relative to terrain model size:");
         imageResolutionPanel.add(jLabel1, new java.awt.GridBagConstraints());
 
-        imageResolutionSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 10, 1));
+        imageResolutionSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 25, 1));
         imageResolutionPanel.add(imageResolutionSpinner, new java.awt.GridBagConstraints());
 
         scaleTerrainPanel.setLayout(new java.awt.GridBagLayout());
@@ -241,7 +241,16 @@ public class MainWindow extends javax.swing.JFrame {
 
         menuBar.add(fileMenu);
 
-        jMenu1.setText("Edit");
+        editMenu.setText("Edit");
+        editMenu.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                editMenuMenuSelected(evt);
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+        });
 
         scaleTerrainModelMenuItem.setText("Scale Terrain Model");
         scaleTerrainModelMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -249,7 +258,7 @@ public class MainWindow extends javax.swing.JFrame {
                 scaleTerrainModelMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(scaleTerrainModelMenuItem);
+        editMenu.add(scaleTerrainModelMenuItem);
 
         offsetTerrainModelMenuItem.setText("Vertically Offset Terrain Model");
         offsetTerrainModelMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -257,9 +266,9 @@ public class MainWindow extends javax.swing.JFrame {
                 offsetTerrainModelMenuItemActionPerformed(evt);
             }
         });
-        jMenu1.add(offsetTerrainModelMenuItem);
+        editMenu.add(offsetTerrainModelMenuItem);
 
-        menuBar.add(jMenu1);
+        menuBar.add(editMenu);
 
         viewMenu.setText("View");
         viewMenu.addMenuListener(new javax.swing.event.MenuListener() {
@@ -601,6 +610,12 @@ public class MainWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_offsetTerrainModelMenuItemActionPerformed
 
+    private void editMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_editMenuMenuSelected
+        boolean gridLoaded = (model.getGrid() != null);
+        scaleTerrainModelMenuItem.setEnabled(gridLoaded);
+        offsetTerrainModelMenuItem.setEnabled(gridLoaded);
+    }//GEN-LAST:event_editMenuMenuSelected
+
     /**
      * Ask the user for a file to read or write.
      *
@@ -707,10 +722,10 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu editMenu;
     private javax.swing.JPanel imageResolutionPanel;
     private javax.swing.JSpinner imageResolutionSpinner;
     private javax.swing.JMenuItem infoMenuItem;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar menuBar;
     private edu.oregonstate.cartography.gui.NavigableImagePanel navigableImagePanel;
     private javax.swing.JFormattedTextField offsetTerrainFormattedTextField;
