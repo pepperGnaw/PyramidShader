@@ -1209,8 +1209,10 @@ public class SettingsPanel extends javax.swing.JPanel {
         Object contourTextVal = contoursIntervalTextBox.getValue();
         if (contourTextVal != null) {
             double d = ((Number) contourTextVal).doubleValue();
-            model.contoursInterval = d;
-            updateImage(REGULAR);
+            if (d != model.contoursInterval) {
+                model.contoursInterval = d;
+                updateImage(REGULAR);
+            }
         }
     }//GEN-LAST:event_contoursIntervalTextBoxPropertyChange
 
@@ -1235,21 +1237,6 @@ public class SettingsPanel extends javax.swing.JPanel {
         contoursMinLineWidthValueLabel.setText(t);
     }
 
-    /**
-     * Returns true if any of the sliders for adjusting contour line widths is
-     * currently moving.
-     *
-     * @return
-     */
-    private boolean isContoursLineWidthSliderAdjusting() {
-        return contoursIlluminatedHighestLineWidthSlider.getValueIsAdjusting()
-                || contoursIlluminatedLowestLineWidthSlider.getValueIsAdjusting()
-                || contoursShadowHighestLineWidthSlider.getValueIsAdjusting()
-                || contoursShadowLowestLineWidthSlider.getValueIsAdjusting()
-                || contoursMinLineWidthSlider.getValueIsAdjusting();
-    }
-    
-    
     private void contoursIlluminatedHighestLineWidthSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursIlluminatedHighestLineWidthSliderStateChanged
         model.contoursIlluminatedWidthHigh = contoursIlluminatedHighestLineWidthSlider.getValue() / 10.f;
         boolean locked = contoursIlluminatedLockedToggleButton.isSelected();
@@ -1303,7 +1290,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         model.contoursShadowWidthLow = contoursShadowLowestLineWidthSlider.getValue() / 10d;
         model.contoursShadowWidthHigh = contoursShadowHighestLineWidthSlider.getValue() / 10d;
 
-        updateImage(isContoursLineWidthSliderAdjusting() ? FAST : REGULAR);
+        updateImage(contoursMinLineWidthSlider.getValueIsAdjusting() ? FAST : REGULAR);
         DecimalFormat df = new DecimalFormat("0.0");
         String t = df.format(model.contoursIlluminatedWidthLow);
         contoursIlluminatedLineWidthHighValueLabel.setText(t);
@@ -1370,13 +1357,13 @@ public class SettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_localGridLowPassSliderStateChanged
 
     private void contoursDespeckleSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursDespeckleSliderStateChanged
-        model.contoursAspectGaussBlur = contoursDespeckleSlider.getValue() / 20D;
-        updateImage(contoursDespeckleSlider.getValueIsAdjusting() ? FAST : REGULAR);
+            model.contoursAspectGaussBlur = contoursDespeckleSlider.getValue() / 20D;
+            updateImage(contoursDespeckleSlider.getValueIsAdjusting() ? FAST : REGULAR);
     }//GEN-LAST:event_contoursDespeckleSliderStateChanged
 
     private void contoursTransitionSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursTransitionSliderStateChanged
-        model.contoursTransitionAngle = contoursTransitionSlider.getValue();
-        updateImage(contoursTransitionSlider.getValueIsAdjusting() ? FAST : REGULAR);
+            model.contoursTransitionAngle = contoursTransitionSlider.getValue();
+            updateImage(contoursTransitionSlider.getValueIsAdjusting() ? FAST : REGULAR);
     }//GEN-LAST:event_contoursTransitionSliderStateChanged
 
     private void contoursBlankBackgroundButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contoursBlankBackgroundButtonActionPerformed
@@ -1386,8 +1373,8 @@ public class SettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_contoursBlankBackgroundButtonActionPerformed
 
     /**
-     * Call this after a slider for adjusting contour line width on illuminated 
-     * or shadowed slopes has been adjusted. 
+     * Call this after a slider for adjusting contour line width on illuminated
+     * or shadowed slopes has been adjusted.
      * @param masterSlider The dragged slider
      * @param slaveSlider The slider linked to the master slider.
      * @param masterLabel The label for the master slider.
@@ -1398,7 +1385,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             JSlider slaveSlider, JLabel masterLabel, JLabel slaveLabel, boolean locked) {
         double w = masterSlider.getValue() / 10.f;
         adjustContoursMinLineWidthSlider(masterSlider);
-        updateImage(isContoursLineWidthSliderAdjusting() ? FAST : REGULAR);
+        updateImage(masterSlider.getValueIsAdjusting() ? FAST : REGULAR);
         String t = new DecimalFormat("0.0").format(w);
         masterLabel.setText(t);
         if (locked) {
@@ -1437,7 +1424,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         model.contoursShadowWidthLow = contoursShadowLowestLineWidthSlider.getValue() / 10.f;
         boolean locked = contoursShadowedLockedToggleButton.isSelected();
         contoursWidthSliderStateChanged(
-                contoursShadowLowestLineWidthSlider, 
+                contoursShadowLowestLineWidthSlider,
                 contoursShadowHighestLineWidthSlider,
                 contoursShadowLineWidthLowValueLabel,
                 contoursShadowLineWidthHighValueLabel,
