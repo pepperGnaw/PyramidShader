@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.Preferences;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
@@ -507,15 +508,19 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     private void saveContours(String askFileMessage, String imageFormat) {
+        String PREFS_NAME = "contours_scale";
         String filePath = askFile(askFileMessage, false);
         if (filePath != null) {
             filePath = FileUtils.forceFileNameExtension(filePath, imageFormat);
             String title = "Image Resolution";
+            Preferences prefs = Preferences.userNodeForPackage(MainWindow.class);
+            imageResolutionSpinner.setValue(prefs.getInt(PREFS_NAME, 5));
             int res = JOptionPane.showOptionDialog(getContentPane(), imageResolutionPanel, title,
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
             if (res == JOptionPane.OK_OPTION) {
                 int scale = (Integer) (imageResolutionSpinner.getValue());
                 exportContours(filePath, imageFormat, scale);
+                prefs.putInt(PREFS_NAME, scale);
             }
         }
     }
