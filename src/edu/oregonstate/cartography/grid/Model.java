@@ -4,6 +4,7 @@ import static edu.oregonstate.cartography.grid.Model.ForegroundVisualization.ILL
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator;
 import edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisualization;
 import edu.oregonstate.cartography.grid.operators.GridAddOperator;
+import edu.oregonstate.cartography.grid.operators.GridCopyOperator;
 import edu.oregonstate.cartography.grid.operators.GridScaleOperator;
 import edu.oregonstate.cartography.grid.operators.GridScaleToRangeOperator;
 import edu.oregonstate.cartography.grid.operators.GridSlopeOperator;
@@ -86,7 +87,7 @@ public class Model implements Cloneable {
     /**
      * the number of levels of the Laplacian pyramid that are filtered
      */
-    public int generalizationMaxLevels = 0;
+    public int generalizationMaxLevels = 2;
 
     /**
      * amount of filtering applied to generalizationMaxLevels pyramid levels.
@@ -94,7 +95,7 @@ public class Model implements Cloneable {
      * 1 (hence no generalization). With +1 the weigh for all
      * generalizationMaxLevels is 0.
      */
-    private double generalizationDetails = -0.8;
+    private double generalizationDetails = -1;
 
     /**
      * illumination azimuth
@@ -298,28 +299,34 @@ public class Model implements Cloneable {
     }
 
     /**
-     * re-computes generalized grid. Call this method whenever the generalization
-     * parameters have changed.
+     * re-computes generalized grid. Call this method whenever the
+     * generalization parameters have changed.
      */
     public void updateGeneralizedGrid() {
         if (laplacianPyramid == null) {
             return;
         }
 
-        // compute weights for summing levels in Laplacian pyramid
-        float[] w = new float[laplacianPyramid.getLevels().length];
-        for (int i = 0; i < w.length; i++) {
-            w[i] = getPyramidLevelWeight(i);
+        //long start = System.nanoTime();
+        if (isGeneralizing()) {
+            // compute weights for summing levels in Laplacian pyramid
+            float[] w = new float[laplacianPyramid.getLevels().length];
+            for (int i = 0; i < w.length; i++) {
+                w[i] = getPyramidLevelWeight(i);
+            }
+
+            // sum the Laplacian pyramids
+            generalizedGrid = laplacianPyramid.sumLevels(w);
+
+            // scale the minimum and maximum values of the output generalizedGrid to 
+            // the same range as the input generalizedGrid.
+            new GridScaleToRangeOperator(gridMinMax).operate(generalizedGrid, generalizedGrid);
+
+            generalizedSlopeGrid = new GridSlopeOperator().operate(generalizedGrid);
+        } else {
+            generalizedGrid = new GridCopyOperator().operate(grid);
         }
-
-        // sum the Laplacian pyramids
-        generalizedGrid = laplacianPyramid.sumLevels(w);
-
-        // scale the minimum and maximum values of the output generalizedGrid to 
-        // the same range as the input generalizedGrid.
-        new GridScaleToRangeOperator(gridMinMax).operate(generalizedGrid, generalizedGrid);
-
-        generalizedSlopeGrid = new GridSlopeOperator().operate(generalizedGrid);
+        //System.out.println((System.nanoTime() - start) / 1000 / 1000 + "ms");
     }
 
     /**
@@ -493,6 +500,15 @@ public class Model implements Cloneable {
      */
     public double getGeneralizationDetails() {
         return generalizationDetails;
+    }
+
+    /**
+     * Returns true if the grid is being generalized.
+     *
+     * @return
+     */
+    public boolean isGeneralizing() {
+        return generalizationDetails > -1d;
     }
 
     /**

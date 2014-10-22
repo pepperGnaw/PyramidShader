@@ -78,11 +78,11 @@ public class SettingsPanel extends javax.swing.JPanel {
                     int w = displayImage.getWidth();
                     int h = displayImage.getHeight();
                     Graphics g = displayImage.getGraphics();
-                    
+
                     // erase previous image
                     g.setColor(Color.WHITE);
                     g.fillRect(0, 0, displayImage.getWidth(), displayImage.getHeight());
-                    
+
                     // copy background image into the display image
                     g.drawImage(backgroundImage, 0, 0, w, h, null);
 
@@ -469,7 +469,8 @@ public class SettingsPanel extends javax.swing.JPanel {
         generalizationDetailSlider.setMinorTickSpacing(1);
         generalizationDetailSlider.setPaintTicks(true);
         generalizationDetailSlider.setSnapToTicks(true);
-        generalizationDetailSlider.setValue(-5);
+        generalizationDetailSlider.setToolTipText("");
+        generalizationDetailSlider.setValue(-10);
         generalizationDetailSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 generalizationDetailSliderStateChanged(evt);
@@ -491,7 +492,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         generalizationPanel.add(generalizationMaxLabel, gridBagConstraints);
 
-        generalizationMaxLevelsSpinner.setModel(new javax.swing.SpinnerNumberModel(3, 0, 10, 1));
+        generalizationMaxLevelsSpinner.setModel(new javax.swing.SpinnerNumberModel(3, 1, 10, 1));
         generalizationMaxLevelsSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 generalizationMaxLevelsSpinnerStateChanged(evt);
@@ -1160,11 +1161,9 @@ public class SettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_azimuthSliderStateChanged
 
     private void updateGeneralizationInfoLabelVisiblity() {
-        int maxLevel = (Integer) (generalizationMaxLevelsSpinner.getValue());
-        double details = generalizationDetailSlider.getValue() / 10d;
-        boolean showLabel = maxLevel <= 0 || details <= -1d;
-        generalizationInfoLabel.setVisible(showLabel);
+        generalizationInfoLabel.setVisible(!model.isGeneralizing());
     }
+
     private void generalizationDetailSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_generalizationDetailSliderStateChanged
         //don't take action until user has finished adjusting
         if (generalizationDetailSlider.getValueIsAdjusting() == false) {
