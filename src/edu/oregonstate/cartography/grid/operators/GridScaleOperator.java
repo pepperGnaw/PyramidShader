@@ -18,6 +18,7 @@ public class GridScaleOperator extends ThreadedGridOperator {
         this.scale = scale;
     }
    
+    @Override
     public void operate(Grid src, Grid dst, int startRow, int endRow) {
         float[][] srcGrid = src.getGrid();
         float[][] dstGrid = dst.getGrid();

@@ -707,7 +707,9 @@ public class MainWindow extends javax.swing.JFrame {
             protected Void doInBackground() throws Exception {
                 start();
                 //import the DEM and create pyramids
-                Grid grid = EsriASCIIGridReader.read(filePath);
+                Grid grid = EsriASCIIGridReader.read(filePath, this);
+                this.setIndeterminate(true);
+                this.disableCancel();
                 model.setGrid(grid);
                 return null;
             }
@@ -715,7 +717,7 @@ public class MainWindow extends javax.swing.JFrame {
         };
 
         worker.setMaxTimeWithoutDialogMilliseconds(2000);
-        worker.setIndeterminate(true);
+        worker.setIndeterminate(false);
         worker.disableCancel();
         worker.setMessage("Importing Terrain Model");
         worker.execute();
