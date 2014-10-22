@@ -298,7 +298,7 @@ public class Model implements Cloneable {
     }
 
     /**
-     * re-computes generalizedGrid. Call this method whenever the generalization
+     * re-computes generalized grid. Call this method whenever the generalization
      * parameters have changed.
      */
     public void updateGeneralizedGrid() {

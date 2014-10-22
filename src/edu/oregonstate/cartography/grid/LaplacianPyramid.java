@@ -359,7 +359,7 @@ public class LaplacianPyramid {
         }
         
         // copy the smallest grid of the pyramid
-        Grid sum = levels[levels.length - 1].clone();
+        Grid sum = new Grid(levels[levels.length - 1]);
 
         // the weight for the base is usually 1, but might be different for
         // a high-pass filter

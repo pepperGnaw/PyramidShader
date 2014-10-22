@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
  *
  * @author Bernhard Jenny, Institute of Cartography, ETH Zurich.
  */
-public final class Grid implements Cloneable {
+public final class Grid {
 
     /**
      * The size between two neighboring columns or rows.
@@ -34,6 +34,23 @@ public final class Grid implements Cloneable {
      * vertical coordinate of south border
      */
     private double south = 0;
+
+    /**
+     * Copy constructor
+     * @param template
+     */
+    public Grid(Grid template) {
+        this(template.getCols(), template.getRows(), template.getCellSize());
+        west = template.getWest();
+        south = template.getSouth();
+        
+        // deep clone grid array
+        int nRows = template.getRows();
+        int nCols = template.getCols();
+        for (int row = 0; row < nRows; row++) {
+            System.arraycopy(template.grid[row], 0, grid[row], 0, nCols);
+        }
+    }
 
     /**
      * Creates a new instance of Grid.
@@ -59,17 +76,17 @@ public final class Grid implements Cloneable {
      * @param cellSize The size between two rows or columns.
      */
     public Grid(int cols, int rows, double cellSize) {
+        this(cols, rows);
+        
         // the grid must contain at least 2 x 2 cells.
         if (cols < 3 || rows < 3) {
             throw new IllegalArgumentException("Not enough data points.");
         }
-        
+
         if (cellSize <= 0) {
             throw new IllegalArgumentException("Negative cell size");
         }
-
         this.cellSize = cellSize;
-        this.grid = new float[rows][cols];
     }
 
     /**
@@ -110,6 +127,7 @@ public final class Grid implements Cloneable {
      * Bilinear interpolation. See
      * http://www.geovista.psu.edu/sites/geocomp99/Gc99/082/gc_082.htm "What's
      * the point? Interpolation and extrapolation with a regular grid DEM"
+     *
      * @param x horizontal coordinate
      * @param y vertical coordinate
      * @return interpolated value
@@ -207,8 +225,9 @@ public final class Grid implements Cloneable {
     /**
      * Returns true if the passed grid has the same number of columns and rows
      * and has the same cell size.
+     *
      * @param grid
-     * @return 
+     * @return
      */
     public boolean isIdenticalInSize(Grid grid) {
         if (grid == null) {
@@ -247,9 +266,10 @@ public final class Grid implements Cloneable {
     /**
      * Returns the slope for col in [1, cols-2] and row in [1, rows - 2]
      * http://help.arcgis.com/en/arcgisdesktop/10.0/help../index.html#/How_Slope_works/009z000000vz000000/
+     *
      * @param col
      * @param row
-     * @return 
+     * @return
      */
     public double getSlopeInsideGrid(int col, int row) {
         double a = getValue(col - 1, row - 1);
@@ -267,18 +287,18 @@ public final class Grid implements Cloneable {
         double dZdY = ((g + (2 * h) + i) - (a + (2 * b) + c)) / (8 * cellSize);
         return Math.sqrt((dZdX * dZdX) + (dZdY * dZdY));
     }
-    
+
     // http://help.arcgis.com/en/arcgisdesktop/10.0/help../index.html#/How_Slope_works/009z000000vz000000/
     public double getSlope(int col, int row) {
         final double a, b, c, d, f, g, h, i;
         final int cols = grid[0].length;
         final int rows = grid.length;
-        
+
         final int colLeft = col > 0 ? col - 1 : 0;
         final int colRight = col < cols - 1 ? col + 1 : cols - 1;
         final int rowTop = row > 0 ? row - 1 : 0;
         final int rowBottom = row < rows - 1 ? row + 1 : rows - 1;
-        
+
         a = getValue(colLeft, rowTop);
         b = getValue(col, rowTop);
         c = getValue(colRight, rowTop);
@@ -296,28 +316,16 @@ public final class Grid implements Cloneable {
     }
 
     @Override
-    public Grid clone() {
-        final int nRows = getRows();
-        final int nCols = getCols();
-        Grid clone = new Grid(nCols, nRows, cellSize);
-
-        // deep clone of grid
-        for (int row = 0; row < nRows; row++) {
-            System.arraycopy(grid[row], 0, clone.grid[row], 0, nCols);
-        }
-        return clone;
-    }
-
-    @Override
     public String toString() {
         float[] minMax = getMinMax();
         return "Grid: rows:" + getRows() + " cols:" + getCols() + " range:" + minMax[0] + " to " + minMax[1];
     }
-    
+
     /**
      * Returns a descriptive text for GUI display.
+     *
      * @param newLine The line separator. Could be \n, <br> or null.
-     * @return 
+     * @return
      */
     public String getDescription(String newLine) {
         if (newLine == null) {
@@ -347,11 +355,12 @@ public final class Grid implements Cloneable {
         sb.append(f.format(getSouth() + (getRows() - 1) * getCellSize()));
         return sb.toString();
     }
-    
+
     /**
      * Returns a descriptive text for GUI display, including min and max values.
+     *
      * @param newLine The line separator. Could be \n, <br> or null.
-     * @return 
+     * @return
      */
     public String getDescriptionWithStatistics(String newLine) {
         if (newLine == null) {
@@ -399,7 +408,8 @@ public final class Grid implements Cloneable {
 
     /**
      * The northern border of this grid
-     * @return 
+     *
+     * @return
      */
     public double getNorth() {
         return getSouth() + (getRows() - 1) * getCellSize();

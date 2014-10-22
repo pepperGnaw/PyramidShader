@@ -10,7 +10,9 @@ import edu.oregonstate.cartography.grid.operators.ColorizerOperator.ColorVisuali
 import static edu.oregonstate.cartography.gui.SettingsPanel.RenderSpeed.FAST;
 import static edu.oregonstate.cartography.gui.SettingsPanel.RenderSpeed.REGULAR;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ItemEvent;
 import java.awt.image.BufferedImage;
@@ -76,6 +78,12 @@ public class SettingsPanel extends javax.swing.JPanel {
                     int w = displayImage.getWidth();
                     int h = displayImage.getHeight();
                     Graphics g = displayImage.getGraphics();
+                    
+                    // erase previous image
+                    g.setColor(Color.WHITE);
+                    g.fillRect(0, 0, displayImage.getWidth(), displayImage.getHeight());
+                    
+                    // copy background image into the display image
                     g.drawImage(backgroundImage, 0, 0, w, h, null);
 
                     // copy foreground image into the display image if required.
@@ -1164,7 +1172,7 @@ public class SettingsPanel extends javax.swing.JPanel {
             //compute the summed pyramids using the original grid
             model.updateGeneralizedGrid();
             //shade, color, and redraw
-            updateImage(generalizationDetailSlider.getValueIsAdjusting() ? FAST : REGULAR);
+            updateImage(REGULAR);
         }
 
         // write value to GUI
@@ -1357,13 +1365,13 @@ public class SettingsPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_localGridLowPassSliderStateChanged
 
     private void contoursDespeckleSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursDespeckleSliderStateChanged
-            model.contoursAspectGaussBlur = contoursDespeckleSlider.getValue() / 20D;
-            updateImage(contoursDespeckleSlider.getValueIsAdjusting() ? FAST : REGULAR);
+        model.contoursAspectGaussBlur = contoursDespeckleSlider.getValue() / 20D;
+        updateImage(contoursDespeckleSlider.getValueIsAdjusting() ? FAST : REGULAR);
     }//GEN-LAST:event_contoursDespeckleSliderStateChanged
 
     private void contoursTransitionSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_contoursTransitionSliderStateChanged
-            model.contoursTransitionAngle = contoursTransitionSlider.getValue();
-            updateImage(contoursTransitionSlider.getValueIsAdjusting() ? FAST : REGULAR);
+        model.contoursTransitionAngle = contoursTransitionSlider.getValue();
+        updateImage(contoursTransitionSlider.getValueIsAdjusting() ? FAST : REGULAR);
     }//GEN-LAST:event_contoursTransitionSliderStateChanged
 
     private void contoursBlankBackgroundButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contoursBlankBackgroundButtonActionPerformed
@@ -1375,6 +1383,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     /**
      * Call this after a slider for adjusting contour line width on illuminated
      * or shadowed slopes has been adjusted.
+     *
      * @param masterSlider The dragged slider
      * @param slaveSlider The slider linked to the master slider.
      * @param masterLabel The label for the master slider.

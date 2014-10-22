@@ -280,12 +280,15 @@ public class IlluminatedContoursOperator extends ThreadedGridOperator {
         double illumination = 90 - azimuth;
         // calculate minumum angle between illumination angle and aspect
         double angleDiff = smallestAngleDiff(illumination, aspect);
-        // set 'a' based on the angle distance from the angle of illumination.
+        
+        // compute the line widths, which vary with elevation
         double w = (gridMax - elevation) / (gridMax - gridMin);
         //double gamma = 2;
         //w = Math.pow(w, 1d / gamma);
         double shadowWidth = shadowWidthLow * w  + shadowWidthHigh * (1d - w);
         double illiminatedWidth = illuminatedWidthLow * w  + illuminatedWidthHigh * (1d - w);
+        
+        // set 'a' based on the angle distance from the angle of illumination.
         double a;
         if (angleDiff > transitionAngle) {
             a = shadowWidth * slope * cellSize;
