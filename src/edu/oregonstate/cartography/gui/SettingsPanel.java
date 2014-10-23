@@ -141,41 +141,47 @@ public class SettingsPanel extends javax.swing.JPanel {
     }
 
     public void updateImage(RenderSpeed renderSpeed) {
-        MainWindow mainWindow = getOwnerWindow();
-        if (mainWindow == null || model == null) {
-            return;
-        }
+        try {
+            MainWindow mainWindow = getOwnerWindow();
+            if (mainWindow == null || model == null) {
+                return;
+            }
 
-        // if we are currently rendering an image, first cancel the current rendering
-        if (renderer != null && !renderer.isDone()) {
+            // if we are currently rendering an image, first cancel the current rendering
+            if (renderer != null && !renderer.isDone()) {
             // FIXME
-            //renderer.cancel(false);
-        }
+                //renderer.cancel(false);
+            }
 
         // block the event dispatching thread until the BackgroundRenderer worker thread
-        // is done. This is to avoid that two BackgroundRenderer threads write to 
-        // the same image.
-        try {
-            if (renderer != null) {
-                renderer.get();
+            // is done. This is to avoid that two BackgroundRenderer threads write to 
+            // the same image.
+            try {
+                if (renderer != null) {
+                    renderer.get();
+                }
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(SettingsPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(SettingsPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
         // create destination image
-        // note: it is not possible to reuse this image. Flickering artifacts
-        // will appear otherwise.
-        BufferedImage backgroundImage = model.createDestinationImage(1);
-        if (backgroundImage == null) {
-            return;
-        }
-        int foregroundScale = (renderSpeed == FAST ? 1 : 2);
-        BufferedImage foregroundImage = model.createDestinationImage(foregroundScale);
+            // note: it is not possible to reuse this image. Flickering artifacts
+            // will appear otherwise.
+            BufferedImage backgroundImage = model.createDestinationImage(1);
+            if (backgroundImage == null) {
+                return;
+            }
+            int foregroundScale = (renderSpeed == FAST ? 1 : 2);
+            BufferedImage foregroundImage = model.createDestinationImage(foregroundScale);
 
-        // create a new renderer and run it
-        renderer = new BackgroundRenderer(backgroundImage, foregroundImage);
-        renderer.execute();
+            // create a new renderer and run it
+            renderer = new BackgroundRenderer(backgroundImage, foregroundImage);
+            renderer.execute();
+        } catch (Throwable e) {
+            String msg = "<html>An error occured when rendering the terrain.</html>";
+            String title = "Error";
+            ErrorDialog.showErrorDialog(msg, title, e, null);
+        }
     }
 
     /**

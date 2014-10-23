@@ -685,7 +685,12 @@ public class MainWindow extends javax.swing.JFrame {
                     // initialize the display image
                     BufferedImage image = model.createDestinationImage(imageScaleFactor);
                     navigableImagePanel.setImage(image);
-
+                    
+                    // hide the progress dialog before rendering the image
+                    // if rendering throws an error, the progress dialog should 
+                    // have been closed
+                    completeProgress();
+                    
                     // this will render the image
                     settingsDialog.modelChanged();
                 } catch (ExecutionException e) {
