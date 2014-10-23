@@ -432,6 +432,7 @@ public class NavigableImagePanel extends JPanel {
                 image.getType());
         Graphics g = navigationImage.getGraphics();
         g.drawImage(image, 0, 0, navImageWidth, navImageHeight, null);
+        g.dispose();
     }
 
     /**

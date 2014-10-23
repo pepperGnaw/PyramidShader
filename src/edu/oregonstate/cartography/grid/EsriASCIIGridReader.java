@@ -131,6 +131,8 @@ public class EsriASCIIGridReader {
             grid.setSouth(header.getSouth());
 
             // http://www.java2s.com/Code/Java/Threads/ProducerconsumerforJ2SE15usingconcurrent.htm
+            // a limited capacity of around 64 works fastest on the system used
+            // for development with large grids
             BlockingQueue<String> q = new LinkedBlockingQueue<>(64);
             q.put(firstGridLine);
             
@@ -245,6 +247,9 @@ public class EsriASCIIGridReader {
                     
                     // split each line in tokens and parse the tokens for a float.
                     // One row in the grid might not correspond to a grid row.
+                    // StringTokenizer is faster than String.split()
+                    // About 50% of the time in this spent with tokenizing the string,
+                    // and 50% is spent with Float.parseFloat().
                     StringTokenizer tokenizer = new StringTokenizer(str, " \t");
                     while (tokenizer.hasMoreTokens()
                             // check whether this thread has been interrupted

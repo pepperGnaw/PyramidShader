@@ -69,15 +69,16 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         @Override
         protected void done() {
+            Graphics g = null;
+            MainWindow mainWindow = getOwnerWindow();
             try {
-                MainWindow mainWindow = getOwnerWindow();
                 if (!isCancelled() && mainWindow != null) {
                     get();
 
                     BufferedImage displayImage = mainWindow.getImage();
                     int w = displayImage.getWidth();
                     int h = displayImage.getHeight();
-                    Graphics g = displayImage.getGraphics();
+                    g = displayImage.getGraphics();
 
                     // erase previous image
                     g.setColor(Color.WHITE);
@@ -93,10 +94,15 @@ public class SettingsPanel extends javax.swing.JPanel {
                                 RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
                         g.drawImage(img, 0, 0, w, h, null);
                     }
-                    g.dispose();
-                    mainWindow.repaintImage();
                 }
             } catch (Exception ignore) {
+            } finally {
+                if (g != null) {
+                    g.dispose();
+                }
+                if (!isCancelled() && mainWindow != null) {
+                    mainWindow.repaintImage();
+                }
             }
         }
     }
@@ -149,11 +155,11 @@ public class SettingsPanel extends javax.swing.JPanel {
 
             // if we are currently rendering an image, first cancel the current rendering
             if (renderer != null && !renderer.isDone()) {
-            // FIXME
+                // FIXME
                 //renderer.cancel(false);
             }
 
-        // block the event dispatching thread until the BackgroundRenderer worker thread
+            // block the event dispatching thread until the BackgroundRenderer worker thread
             // is done. This is to avoid that two BackgroundRenderer threads write to 
             // the same image.
             try {
@@ -164,7 +170,7 @@ public class SettingsPanel extends javax.swing.JPanel {
                 Logger.getLogger(SettingsPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        // create destination image
+            // create destination image
             // note: it is not possible to reuse this image. Flickering artifacts
             // will appear otherwise.
             BufferedImage backgroundImage = model.createDestinationImage(1);
@@ -216,11 +222,11 @@ public class SettingsPanel extends javax.swing.JPanel {
         solidColorButton = new edu.oregonstate.cartography.gui.ColorButton();
         javax.swing.JPanel generalizationContainer = new TransparentMacPanel();
         generalizationPanel = new TransparentMacPanel();
-        javax.swing.JLabel generalizationDetailLabel = new javax.swing.JLabel();
+        javax.swing.JLabel generalizationDetailsRemovalLabel = new javax.swing.JLabel();
         generalizationDetailSlider = new javax.swing.JSlider();
         javax.swing.JLabel generalizationMaxLabel = new javax.swing.JLabel();
         generalizationMaxLevelsSpinner = new javax.swing.JSpinner();
-        generalizationDetaiIndicator = new javax.swing.JLabel();
+        generalizationDetaiIsLabel = new javax.swing.JLabel();
         generalizationInfoLabel = new javax.swing.JLabel();
         javax.swing.JPanel illuminationContainer = new TransparentMacPanel();
         illuminationPanel = new TransparentMacPanel();
@@ -461,22 +467,20 @@ public class SettingsPanel extends javax.swing.JPanel {
 
         generalizationPanel.setLayout(new java.awt.GridBagLayout());
 
-        generalizationDetailLabel.setText("Details Removal");
+        generalizationDetailsRemovalLabel.setText("Details Removal");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-        generalizationPanel.add(generalizationDetailLabel, gridBagConstraints);
+        generalizationPanel.add(generalizationDetailsRemovalLabel, gridBagConstraints);
 
-        generalizationDetailSlider.setMajorTickSpacing(10);
-        generalizationDetailSlider.setMaximum(10);
-        generalizationDetailSlider.setMinimum(-10);
-        generalizationDetailSlider.setMinorTickSpacing(1);
+        generalizationDetailSlider.setMajorTickSpacing(100);
+        generalizationDetailSlider.setMinimum(-100);
+        generalizationDetailSlider.setMinorTickSpacing(10);
         generalizationDetailSlider.setPaintTicks(true);
-        generalizationDetailSlider.setSnapToTicks(true);
         generalizationDetailSlider.setToolTipText("");
-        generalizationDetailSlider.setValue(-10);
+        generalizationDetailSlider.setValue(-100);
         generalizationDetailSlider.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 generalizationDetailSliderStateChanged(evt);
@@ -510,13 +514,13 @@ public class SettingsPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         generalizationPanel.add(generalizationMaxLevelsSpinner, gridBagConstraints);
 
-        generalizationDetaiIndicator.setText("100%");
-        generalizationDetaiIndicator.setPreferredSize(new java.awt.Dimension(40, 16));
+        generalizationDetaiIsLabel.setText("100%");
+        generalizationDetaiIsLabel.setPreferredSize(new java.awt.Dimension(40, 16));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        generalizationPanel.add(generalizationDetaiIndicator, gridBagConstraints);
+        generalizationPanel.add(generalizationDetaiIsLabel, gridBagConstraints);
 
         generalizationInfoLabel.setText("No Generalization");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1112,7 +1116,7 @@ public class SettingsPanel extends javax.swing.JPanel {
         this.model = m;
 
         generalizationMaxLevelsSpinner.setValue(m.generalizationMaxLevels);
-        generalizationDetailSlider.setValue((int) Math.round(m.getGeneralizationDetails() * 10));
+        generalizationDetailSlider.setValue((int) Math.round(m.getGeneralizationDetails() * 100));
 
         azimuthSlider.setValue(m.azimuth);
         zenithSlider.setValue(m.zenith);
@@ -1173,7 +1177,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private void generalizationDetailSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_generalizationDetailSliderStateChanged
         //don't take action until user has finished adjusting
         if (generalizationDetailSlider.getValueIsAdjusting() == false) {
-            model.setGeneralizationDetails(generalizationDetailSlider.getValue() / 10d);
+            model.setGeneralizationDetails(generalizationDetailSlider.getValue() / 100d);
             //compute the summed pyramids using the original grid
             model.updateGeneralizedGrid();
             //shade, color, and redraw
@@ -1181,10 +1185,10 @@ public class SettingsPanel extends javax.swing.JPanel {
         }
 
         // write value to GUI
-        double detailVal = generalizationDetailSlider.getValue() / 10d;
+        double detailVal = generalizationDetailSlider.getValue() / 100d;
         detailVal = (detailVal + 1) / 2;
-        String valString = new DecimalFormat("#.#%").format(detailVal);
-        generalizationDetaiIndicator.setText(valString);
+        String valString = new DecimalFormat("#%").format(detailVal);
+        generalizationDetaiIsLabel.setText(valString);
 
         updateGeneralizationInfoLabelVisiblity();
     }//GEN-LAST:event_generalizationDetailSliderStateChanged
@@ -1476,7 +1480,7 @@ public class SettingsPanel extends javax.swing.JPanel {
     private javax.swing.JSlider contoursShadowLowestLineWidthSlider;
     private javax.swing.JToggleButton contoursShadowedLockedToggleButton;
     private javax.swing.JSlider contoursTransitionSlider;
-    private javax.swing.JLabel generalizationDetaiIndicator;
+    private javax.swing.JLabel generalizationDetaiIsLabel;
     private javax.swing.JSlider generalizationDetailSlider;
     private javax.swing.JLabel generalizationInfoLabel;
     private javax.swing.JSpinner generalizationMaxLevelsSpinner;

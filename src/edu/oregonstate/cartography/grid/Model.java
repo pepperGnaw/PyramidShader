@@ -318,14 +318,13 @@ public class Model implements Cloneable {
             // sum the Laplacian pyramids
             generalizedGrid = laplacianPyramid.sumLevels(w);
 
-            // scale the minimum and maximum values of the output generalizedGrid to 
-            // the same range as the input generalizedGrid.
+            // scale the minimum and maximum values of the output generalized grid to 
+            // the same range as the input grid.
             new GridScaleToRangeOperator(gridMinMax).operate(generalizedGrid, generalizedGrid);
-
-            generalizedSlopeGrid = new GridSlopeOperator().operate(generalizedGrid);
         } else {
             generalizedGrid = new GridCopyOperator().operate(grid);
         }
+        generalizedSlopeGrid = new GridSlopeOperator().operate(generalizedGrid);
         //System.out.println((System.nanoTime() - start) / 1000 / 1000 + "ms");
     }
 
@@ -365,8 +364,8 @@ public class Model implements Cloneable {
         if (backgroundVisualization == ColorVisualization.CONTINUOUS) {
             // fill image with single color
             Graphics2D graphics = (Graphics2D) destinationImage.getGraphics();
-            graphics.setBackground(solidColor);
-            graphics.clearRect(0, 0, destinationImage.getWidth(), destinationImage.getHeight());
+            graphics.setColor(solidColor);
+            graphics.fillRect(0, 0, destinationImage.getWidth(), destinationImage.getHeight());
             graphics.dispose();
         } else {
             // shading

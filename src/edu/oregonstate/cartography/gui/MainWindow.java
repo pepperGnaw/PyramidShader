@@ -8,6 +8,7 @@ import edu.oregonstate.cartography.grid.Model;
 import static edu.oregonstate.cartography.grid.Model.ForegroundVisualization.ILLUMINATED_CONTOURS;
 import edu.oregonstate.cartography.grid.WorldFileExporter;
 import edu.oregonstate.cartography.grid.operators.IlluminatedContoursOperator;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GraphicsDevice;
@@ -667,6 +668,26 @@ public class MainWindow extends javax.swing.JFrame {
                     // exception occured in doInBackground
                     get();
 
+                    // hide the progress dialog before rendering the image
+                    // if rendering throws an error, the progress dialog should 
+                    // have been closed
+                    completeProgress();
+
+                } catch (InterruptedException | CancellationException e) {
+                } catch (Throwable e) {
+                    // hide the progress dialog
+                    completeProgress();
+                    // an exception was thrown in doInBackground
+                    String msg = "<html>An error occured when importing the terrain model."
+                            + "<br>The file must be in Esri ASCII Grid format.</html>";
+                    ErrorDialog.showErrorDialog(msg, "Error", e, getContentPane());
+                    e.printStackTrace();
+                } finally {
+                    // hide the progress dialog
+                    completeProgress();
+                }
+
+                try {
                     // compute a scale factor for the display image
                     // this makes sure contour lines for small grids do not 
                     // appear overly pixelated
@@ -676,35 +697,28 @@ public class MainWindow extends javax.swing.JFrame {
                     int imageScaleFactor = 1;
                     int gridWidth = model.getGrid().getCols();
                     int gridHeight = model.getGrid().getRows();
-                    double heightRatio = (double)screenHeight / gridHeight;
-                    double widthRatio = (double)screenWidth / gridWidth;
+                    double heightRatio = (double) screenHeight / gridHeight;
+                    double widthRatio = (double) screenWidth / gridWidth;
                     double maxRatio = Math.max(heightRatio, widthRatio);
                     if (maxRatio > 1) {
-                        imageScaleFactor = (int)Math.ceil(maxRatio);
-                    }
+                        imageScaleFactor = (int) Math.ceil(maxRatio);
+                    }               
                     // initialize the display image
                     BufferedImage image = model.createDestinationImage(imageScaleFactor);
                     navigableImagePanel.setImage(image);
-                    
-                    // hide the progress dialog before rendering the image
-                    // if rendering throws an error, the progress dialog should 
-                    // have been closed
-                    completeProgress();
-                    
+
                     // this will render the image
                     settingsDialog.modelChanged();
-                } catch (ExecutionException e) {
-                    // hide the progress dialog
-                    completeProgress();
-                    // an exception was thrown in doInBackground
-                    String msg = "<html>An error occured when importing the terrain model."
-                            + "<br>The file must be in Esri ASCII Grid format.</html>";
-                    String title = "Error";
-                    ErrorDialog.showErrorDialog(msg, title, e, getContentPane());
-                } catch (InterruptedException | CancellationException e) {
-                } finally {
-                    // hide the progress dialog
-                    completeProgress();
+                } catch (Throwable e) {
+                    BufferedImage img = navigableImagePanel.getImage();
+                    if (img != null) {
+                        Graphics g = img.getGraphics();
+                        g.setColor(Color.WHITE);
+                        g.fillRect(0, 0, img.getWidth(), img.getHeight());
+                        g.dispose();
+                    }
+                    String msg = "An error occured when rendering the terrain.";
+                    ErrorDialog.showErrorDialog(msg, "Error", e, getContentPane());
                 }
             }
 

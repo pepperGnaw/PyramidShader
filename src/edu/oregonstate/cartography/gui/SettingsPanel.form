@@ -338,7 +338,7 @@
 
               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="generalizationDetailLabel">
+                <Component class="javax.swing.JLabel" name="generalizationDetailsRemovalLabel">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Details Removal"/>
                   </Properties>
@@ -354,14 +354,12 @@
                 </Component>
                 <Component class="javax.swing.JSlider" name="generalizationDetailSlider">
                   <Properties>
-                    <Property name="majorTickSpacing" type="int" value="10"/>
-                    <Property name="maximum" type="int" value="10"/>
-                    <Property name="minimum" type="int" value="-10"/>
-                    <Property name="minorTickSpacing" type="int" value="1"/>
+                    <Property name="majorTickSpacing" type="int" value="100"/>
+                    <Property name="minimum" type="int" value="-100"/>
+                    <Property name="minorTickSpacing" type="int" value="10"/>
                     <Property name="paintTicks" type="boolean" value="true"/>
-                    <Property name="snapToTicks" type="boolean" value="true"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
-                    <Property name="value" type="int" value="-10"/>
+                    <Property name="value" type="int" value="-100"/>
                   </Properties>
                   <Events>
                     <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="generalizationDetailSliderStateChanged"/>
@@ -402,7 +400,7 @@
                     </Constraint>
                   </Constraints>
                 </Component>
-                <Component class="javax.swing.JLabel" name="generalizationDetaiIndicator">
+                <Component class="javax.swing.JLabel" name="generalizationDetaiIsLabel">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="100%"/>
                     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

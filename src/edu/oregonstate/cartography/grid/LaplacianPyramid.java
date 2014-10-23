@@ -8,9 +8,9 @@ import java.util.Arrays;
  * @author Bernhard Jenny, Institute of Cartography, ETH Zurich.
  */
 public class LaplacianPyramid {
-    
+
     private Grid[] levels;
-    
+
     private static final float wa = 0.4f;
     private static final float wb = 0.25f;
     private static final float wc = 0.05f;
@@ -38,6 +38,12 @@ public class LaplacianPyramid {
 
     }
 
+    /**
+     * Horizontally expands the leftmost and rightmost columns of a grid.
+     *
+     * @param src
+     * @param dst
+     */
     private static void expandBorderColumns(Grid src, float[][] dst) {
 
         final int cols = src.getCols();
@@ -50,9 +56,10 @@ public class LaplacianPyramid {
             float v2 = src.getValue(1, r);
             float vEven = 2.f * (wc * (v0 + v2) + wa * v1);
             float vOdd = 2.f * wb * (v1 + v2);
-
-            if (Float.isNaN(vEven) || Float.isNaN(vOdd)) {
-                if (Float.isNaN(vEven) && Float.isNaN(vOdd)) {
+            final boolean evenNaN = Float.isNaN(vEven);
+            final boolean oddNaN = Float.isNaN(vOdd);
+            if (evenNaN || oddNaN) {
+                if (evenNaN && oddNaN) {
                     dst[r][0] = Float.NaN;
                     dst[r][1] = Float.NaN;
                 } else {
@@ -62,7 +69,6 @@ public class LaplacianPyramid {
                 dst[r][0] = vEven;
                 dst[r][1] = vOdd;
             }
-
         }
 
         // right column
@@ -72,21 +78,21 @@ public class LaplacianPyramid {
             float v2 = v1;
             float vEven = 2.f * (wc * (v0 + v2) + wa * v1);
             float vOdd = 2.f * wb * (v1 + v2);
-            int c = (cols - 1) * 2;
-
-            if (Float.isNaN(vEven) || Float.isNaN(vOdd)) {
-                if (Float.isNaN(vEven) && Float.isNaN(vOdd)) {
-                    dst[r][c] = Float.NaN;
-                    dst[r][c + 1] = Float.NaN;
+            int dstCol = (cols - 1) * 2;
+            final boolean evenNaN = Float.isNaN(vEven);
+            final boolean oddNaN = Float.isNaN(vOdd);
+            if (evenNaN || oddNaN) {
+                if (evenNaN && oddNaN) {
+                    dst[r][dstCol] = Float.NaN;
+                    dst[r][dstCol + 1] = Float.NaN;
                 } else {
-                    expandWithVoid(src.getGrid(), dst, c, r, true);
+                    expandWithVoid(src.getGrid(), dst, cols - 1, r, true);
                 }
             } else {
-                dst[r][c] = vEven;
-                dst[r][c + 1] = vOdd;
+                dst[r][dstCol] = vEven;
+                dst[r][dstCol + 1] = vOdd;
             }
         }
-
     }
 
     private static void expandBorderRows(float[][] src, Grid dstGeoGrid) {
@@ -102,35 +108,36 @@ public class LaplacianPyramid {
             float v2 = src[1][c];
             float vEven = 2.f * (wc * (v0 + v2) + wa * v1);
             float vOdd = 2.f * wb * (v1 + v2);
-            if (Float.isNaN(vEven) || Float.isNaN(vOdd)) {
-                if (Float.isNaN(vEven) && Float.isNaN(vOdd)) {
+            final boolean evenNaN = Float.isNaN(vEven);
+            final boolean oddNaN = Float.isNaN(vOdd);
+            if (evenNaN || oddNaN) {
+                if (evenNaN && oddNaN) {
                     dstGrid[0][c] = Float.NaN;
                     dstGrid[1][c] = Float.NaN;
                 } else {
-                    expandWithVoid(dstGeoGrid.getGrid(), dstGrid, c, 0, false);
+                    expandWithVoid(src, dstGrid, c, 0, false);
                 }
             } else {
                 dstGrid[0][c] = vEven;
                 dstGrid[1][c] = vOdd;
             }
-
         }
 
         // bottom row
         for (int c = 0; c < cols; c++) {
-            //float v0 = src[rows / 2 - 2][c];
-            //float v1 = src[rows / 2 - 1][c];
             float v0 = src[src.length - 2][c];
             float v1 = src[src.length - 1][c];
             float v2 = v1;
             float vEven = 2.f * (wc * (v0 + v2) + wa * v1);
             float vOdd = 2.f * wb * (v1 + v2);
-            if (Float.isNaN(vEven) || Float.isNaN(vOdd)) {
-                if (Float.isNaN(vEven) && Float.isNaN(vOdd)) {
+            final boolean evenNaN = Float.isNaN(vEven);
+            final boolean oddNaN = Float.isNaN(vOdd);
+            if (evenNaN || oddNaN) {
+                if (evenNaN && oddNaN) {
                     dstGrid[rows - 2][c] = Float.NaN;
                     dstGrid[rows - 1][c] = Float.NaN;
                 } else {
-                    expandWithVoid(dstGeoGrid.getGrid(), dstGrid, c, rows - 2, false);
+                    expandWithVoid(src, dstGrid, c, src.length - 1, false);
                 }
             } else {
                 dstGrid[rows - 2][c] = vEven;
@@ -141,7 +148,7 @@ public class LaplacianPyramid {
 
     /**
      * Expand the size of a grid by a factor 2.
-     * FIXME: should be multi-threaded
+     *
      * @param grid The grid to expand.
      * @param maxCols
      * @param maxRows
@@ -157,8 +164,8 @@ public class LaplacianPyramid {
         final int newRows = Math.min(maxRows, rows * 2);
 
         Grid expandedGrid = new Grid(newCols, newRows, grid.getCellSize() / 2);
-        //expandedGrid.setWest(geoGrid.getWest());
-        //expandedGrid.setNorth(geoGrid.getNorth());
+        expandedGrid.setWest(grid.getWest());
+        expandedGrid.setSouth(grid.getSouth());
 
         // tempGrid holds an intermediate grid that is expanded horizontally, 
         // but not vertically.
@@ -173,8 +180,10 @@ public class LaplacianPyramid {
                 final float v2 = grid.getValue(c + 1, r);
                 final float vEven = 2.f * (wc * (v0 + v2) + wa * v1);
                 final float vOdd = 2.f * wb * (v1 + v2);
-                if (Float.isNaN(vEven) || Float.isNaN(vOdd)) {
-                    if (Float.isNaN(vEven) && Float.isNaN(vOdd)) {
+                final boolean evenNaN = Float.isNaN(vEven);
+                final boolean oddNaN = Float.isNaN(vOdd);
+                if (evenNaN || oddNaN) {
+                    if (evenNaN && oddNaN) {
                         tempGridRow[c * 2] = Float.NaN;
                         tempGridRow[c * 2 + 1] = Float.NaN;
                     } else {
@@ -191,13 +200,15 @@ public class LaplacianPyramid {
         for (int r = 1; r < rows - 1; r++) {
             for (int c = 0; c < newCols; c++) {
 
-                final float v0 = tempGrid[r - 1][c]; //tempGrid[(r - 1) * cols * 2 + c];
+                final float v0 = tempGrid[r - 1][c];
                 final float v1 = tempGrid[r][c];
                 final float v2 = tempGrid[r + 1][c];
                 final float vEven = 2.f * (wc * (v0 + v2) + wa * v1);
                 final float vOdd = 2.f * wb * (v1 + v2);
-                if (Float.isNaN(vEven) || Float.isNaN(vOdd)) {
-                    if (Float.isNaN(vEven) && Float.isNaN(vOdd)) {
+                final boolean evenNaN = Float.isNaN(vEven);
+                final boolean oddNaN = Float.isNaN(vOdd);
+                if (evenNaN || oddNaN) {
+                    if (evenNaN && oddNaN) {
                         expandedGrid.setValue(Float.NaN, c, 2 * r);
                         expandedGrid.setValue(Float.NaN, c, 2 * r + 1);
                     } else {
@@ -221,13 +232,13 @@ public class LaplacianPyramid {
 
         final float v0, v1, v2;
         if (horizontal) {
-            v0 = srcGrid[r][c - 1];
+            v0 = srcGrid[r][Math.max(0, c - 1)];
             v1 = srcGrid[r][c];
-            v2 = srcGrid[r][c + 1];
+            v2 = srcGrid[r][Math.min(srcGrid[0].length - 1, c + 1)];
         } else {
-            v0 = srcGrid[r - 1][c];
+            v0 = srcGrid[Math.max(0, r - 1)][c];
             v1 = srcGrid[r][c];
-            v2 = srcGrid[r + 1][c];
+            v2 = srcGrid[Math.min(srcGrid.length - 1, r + 1)][c];
         }
 
         float vEven = 0f;
@@ -285,7 +296,7 @@ public class LaplacianPyramid {
         if (!lowFreqSum.isIdenticalInSize(highFreq)) {
             throw new IllegalArgumentException("grids of different size cannot be summed");
         }
-        
+
         if (scale == 0f) {
             return;
         }
@@ -319,9 +330,8 @@ public class LaplacianPyramid {
         final int cols = grid1.getCols();
         final int rows = grid1.getRows();
         Grid difGrid = new Grid(cols, rows, grid1.getCellSize());
-        // FIXME
-        //difGrid.setWest(grid1.getWest());
-        //difGrid.setNorth(grid1.getNorth());
+        difGrid.setWest(grid1.getWest());
+        difGrid.setSouth(grid1.getSouth());
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -336,28 +346,29 @@ public class LaplacianPyramid {
 
     /**
      * Returns an array with constant weights that can be passed to sumLevels
+     *
      * @param w Default weight, use 1 for fully reconstructed grid.
-     * @return Array with weights. Position 0 contains the weight for the highest
-     * frequency band.
+     * @return Array with weights. Position 0 contains the weight for the
+     * highest frequency band.
      */
     public float[] createConstantWeights(float w) {
         float[] weights = new float[levels.length];
         Arrays.fill(weights, w);
         return weights;
     }
-    
+
     /**
      * Sums the levels of the pyramid to re-synthesize the original image.
      *
-     * @param levelWeights Weights applied when merging pyramid levels. The first
-     * value is the weight for the highest frequency band.
+     * @param levelWeights Weights applied when merging pyramid levels. The
+     * first value is the weight for the highest frequency band.
      * @return Synthesized grid.
      */
     public Grid sumLevels(float[] levelWeights) {
         if (levelWeights != null && levelWeights.length != levels.length) {
             throw new IllegalArgumentException("incorrect number of pyramid weights");
         }
-        
+
         // copy the smallest grid of the pyramid
         Grid sum = new Grid(levels[levels.length - 1]);
 
@@ -365,16 +376,16 @@ public class LaplacianPyramid {
         // a high-pass filter
         if (levelWeights != null) {
             float w = levelWeights[levels.length - 1];
-            new GridScaleOperator(w).operate(sum, sum);
-            //System.out.println("base level,\t weight: " + w);
+            if (w != 1f) {
+                new GridScaleOperator(w).operate(sum, sum);
+            }
         }
-        
+
         // expand the sum and and add the next larger grids
         for (int i = levels.length - 2; i >= 0; i--) {
             Grid grid = levels[i];
             sum = LaplacianPyramid.expand(sum, grid.getCols(), grid.getRows());
             float w = (levelWeights == null ? 1 : levelWeights[i]);
-            //System.out.println("level: " + i + ",\t weight: " + w);
             sumGrids(sum, grid, w);
         }
         return sum;
